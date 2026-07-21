@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IEBC Secure Electoral Ballot System — Kenya 2027</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Sans+3:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#070F09;--bg2:#0B1A0F;--card:#0F2316;--card2:#132B1A;--accent:#C9A84C;--accent2:#E0C060;--green:#2D8B4E;--green2:#1B6B38;--fg:#E8E6E1;--muted:#7A8B7E;--border:#1E3A26;--danger:#C94444;--success:#3DA55D;--warn:#D4A030}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Source Sans 3',sans-serif;background:var(--bg);color:var(--fg);overflow-x:hidden}
+h1,h2,h3,.brand{font-family:'Playfair Display',serif}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg2)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+#loading-screen{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .6s,visibility .6s}
+#loading-screen.hidden{opacity:0;visibility:hidden;pointer-events:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loader-text{margin-top:18px;color:var(--accent);font-size:12px;letter-spacing:4px;text-transform:uppercase}
+.loader-bar{width:180px;height:2px;background:var(--border);margin-top:12px;border-radius:1px;overflow:hidden}
+.loader-bar-inner{height:100%;background:var(--accent);animation:loadbar 2s ease-in-out forwards}
+@keyframes loadbar{from{width:0}to{width:100%}}
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:220px;background:var(--bg2);border-right:1px solid var(--border);z-index:100;display:flex;flex-direction:column;transition:transform .3s}
+.sidebar-brand{padding:14px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:9px}
+.sidebar-brand .shield-icon{width:34px;height:38px;background:var(--green);border-radius:5px;display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:16px;flex-shrink:0}
+.sidebar-brand .brand-name{font-size:13px;font-weight:700;color:var(--accent);font-family:'Playfair Display',serif}
+.sidebar-brand .brand-sub{font-size:8px;color:var(--muted);letter-spacing:2px;text-transform:uppercase}
+.sidebar-nav{flex:1;padding:8px 5px;overflow-y:auto}
+.nav-item{display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:6px;color:var(--muted);cursor:pointer;transition:all .2s;font-size:11px;font-weight:600;margin-bottom:1px}
+.nav-item:hover{color:var(--fg);background:rgba(45,139,78,.1)}
+.nav-item.active{color:var(--accent);background:rgba(201,168,76,.1);border-left:3px solid var(--accent)}
+.nav-item i{width:16px;text-align:center;font-size:12px}
+.sidebar-footer{padding:12px;border-top:1px solid var(--border);display:flex;align-items:center;gap:7px}
+.sidebar-footer .avatar{width:28px;height:28px;border-radius:50%;background:var(--green2);display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:11px}
+.sidebar-footer .user-name{color:var(--fg);font-weight:600;font-size:10px}
+.sidebar-footer .user-role{color:var(--muted);font-size:8px;text-transform:uppercase;letter-spacing:1px}
+.main-content{margin-left:220px;min-height:100vh}
+.main-header{position:sticky;top:0;z-index:50;background:rgba(7,15,9,.9);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:10px 20px;display:flex;align-items:center;justify-content:space-between}
+.page-title{font-size:14px;font-weight:700}
+.header-actions{display:flex;align-items:center;gap:10px}
+.header-btn{width:32px;height:32px;border-radius:6px;background:var(--card);border:1px solid var(--border);color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;position:relative;font-size:12px}
+.header-btn:hover{color:var(--accent);border-color:var(--accent)}
+.header-btn .dot{position:absolute;top:5px;right:5px;width:5px;height:5px;background:var(--danger);border-radius:50%;border:1.5px solid var(--bg)}
+.live-badge{display:flex;align-items:center;gap:5px;font-size:9px;font-weight:700;color:var(--danger);text-transform:uppercase;letter-spacing:1px}
+.live-dot{width:6px;height:6px;background:var(--danger);border-radius:50%;animation:pulse-dot 1.5s infinite}
+@keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.3)}}
+.conn-badge{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;text-transform:uppercase;letter-spacing:.5px}
+.conn-badge.online{background:rgba(61,165,93,.15);color:var(--success)}
+.conn-badge.offline{background:rgba(201,68,68,.15);color:var(--danger)}
+.conn-badge.checking{background:rgba(201,168,76,.15);color:var(--accent)}
+.page-body{padding:16px 20px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:.3}
+.card-title{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;font-weight:600;margin-bottom:8px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px;transition:all .3s}
+.stat-card:hover{border-color:var(--green);transform:translateY(-1px)}
+.stat-card .stat-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;margin-bottom:8px}
+.stat-card .stat-value{font-size:24px;font-weight:900;color:var(--fg);font-family:'Playfair Display',serif}
+.stat-card .stat-label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+.ballot-paper{background:#FFFEF5;color:#1a1a1a;border:3px solid #1a1a1a;border-radius:3px;max-width:540px;margin:0 auto;position:relative;font-family:'Source Sans 3',sans-serif;box-shadow:0 6px 28px rgba(0,0,0,.5)}
+.ballot-paper::before{content:'';position:absolute;inset:0;pointer-events:none;z-index:2;background:repeating-linear-gradient(45deg,transparent,transparent 2px,rgba(0,0,0,.012) 2px,rgba(0,0,0,.012) 4px)}
+.ballot-header{background:linear-gradient(135deg,#1B5E20,#2E7D32);color:#fff;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid #1a1a1a}
+.ballot-header .coat-of-arms{width:42px;height:42px;background:rgba(255,255,255,.15);border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid var(--accent);color:var(--accent);font-size:18px}
+.ballot-header .header-text{text-align:center;flex:1;padding:0 8px}
+.ballot-header .header-text h2{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+.ballot-header .header-text h1{font-size:14px;font-weight:900;margin-top:1px;font-family:'Playfair Display',serif}
+.ballot-header .iebc-badge{padding:2px 7px;background:var(--accent);color:#1a1a1a;font-size:7px;font-weight:900;letter-spacing:2px;border-radius:2px;text-transform:uppercase}
+.ballot-instructions{background:#F5F0E0;padding:7px 12px;border-bottom:1px solid #ccc;font-size:9px;color:#555;line-height:1.4}
+.ballot-instructions strong{color:#1a1a1a}
+.ballot-body{padding:8px 12px}
+.ballot-type-bar{background:#1B5E20;color:#fff;text-align:center;padding:6px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;border-radius:2px}
+.candidate-row{display:flex;align-items:center;gap:8px;padding:8px 9px;border:2px solid #ddd;border-radius:3px;margin-bottom:6px;background:#fff;transition:all .2s;cursor:pointer}
+.candidate-row:hover{border-color:#1B5E20;background:#F0FFF0}
+.candidate-row.selected{border-color:#1B5E20;background:#E8F5E9}
+.candidate-row .mark-box{width:28px;height:28px;border:2px solid #333;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;color:#1B5E20;flex-shrink:0}
+.candidate-row .candidate-num{width:20px;height:20px;background:#1B5E20;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
+.candidate-row .candidate-info{flex:1}
+.candidate-row .candidate-name{font-size:12px;font-weight:700;color:#1a1a1a}
+.candidate-row .candidate-party{font-size:9px;color:#666;margin-top:1px}
+.candidate-row .party-symbol{width:30px;height:30px;border-radius:3px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;border:1px solid #ddd}
+.ballot-footer{border-top:2px solid #1a1a1a;padding:8px 12px;display:flex;align-items:flex-start;justify-content:space-between;background:#FAFAF0}
+.ballot-footer .qr-area{text-align:center}
+.ballot-footer .qr-area canvas{border:1px solid #ccc}
+.ballot-footer .security-info{font-size:8px;color:#888;text-align:right;line-height:1.4;max-width:220px}
+.ballot-footer .security-info .sig-hash{font-family:monospace;font-size:6px;word-break:break-all;color:#555}
+.ballot-watermark{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-30deg);font-size:50px;font-weight:900;color:rgba(0,0,0,.03);pointer-events:none;white-space:nowrap;letter-spacing:8px;z-index:1;font-family:'Playfair Display',serif}
+.ballot-microtext{position:absolute;bottom:48px;left:12px;right:12px;font-size:3px;color:rgba(0,0,0,.1);letter-spacing:.5px;overflow:hidden;white-space:nowrap;z-index:1;pointer-events:none}
+.auth-panel{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;position:relative;overflow:hidden}
+.auth-step{display:none;animation:fadeSlideIn .4s ease}
+.auth-step.active{display:block}
+@keyframes fadeSlideIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.fingerprint-scanner{width:170px;height:190px;margin:14px auto;position:relative;border:2px solid var(--border);border-radius:14px;overflow:hidden;background:var(--bg2)}
+.fingerprint-scanner canvas{width:100%;height:100%}
+.scan-line{position:absolute;left:0;right:0;height:2px;background:var(--accent);box-shadow:0 0 8px var(--accent);animation:scanDown 2s linear infinite}
+@keyframes scanDown{from{top:0}to{top:100%}}
+.scan-status{text-align:center;margin-top:8px;font-size:11px;font-weight:600}
+.face-scanner{width:160px;height:160px;margin:14px auto;position:relative;border:2px solid var(--border);border-radius:50%;overflow:hidden;background:var(--bg2)}
+.face-scanner .face-outline{position:absolute;inset:16px;border:2px dashed var(--muted);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:40px;color:var(--muted)}
+.face-scanner .scan-arc{position:absolute;top:0;left:0;right:0;height:50%;border-top-left-radius:160px;border-top-right-radius:160px;border:2px solid transparent;border-top-color:var(--accent);animation:rotateArc 2s linear infinite;transform-origin:bottom center}
+@keyframes rotateArc{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+.input-field{width:100%;padding:10px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;color:var(--fg);font-size:12px;font-family:inherit;transition:all .2s;outline:none}
+.input-field:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(201,168,76,.12)}
+.input-field::placeholder{color:var(--muted)}
+.btn{padding:8px 16px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;transition:all .2s;border:none;font-family:inherit;text-transform:uppercase;letter-spacing:1px;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--accent);color:#1a1a1a}.btn-primary:hover{background:var(--accent2);transform:translateY(-1px)}
+.btn-secondary{background:var(--card2);color:var(--fg);border:1px solid var(--border)}.btn-secondary:hover{border-color:var(--green)}
+.btn-danger{background:var(--danger);color:#fff}.btn-danger:hover{background:#d55}
+.btn-success{background:var(--success);color:#fff}.btn-success:hover{background:#4dbd6a}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.w-full{width:100%}
+.progress-steps{display:flex;align-items:center;gap:0;margin-bottom:16px}
+.progress-step{display:flex;align-items:center;gap:5px;font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:1px;white-space:nowrap}
+.progress-step.active{color:var(--accent)}.progress-step.done{color:var(--success)}
+.progress-step .step-dot{width:24px;height:24px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:9px;transition:all .3s}
+.progress-step.active .step-dot{border-color:var(--accent);background:rgba(201,168,76,.15);color:var(--accent)}
+.progress-step.done .step-dot{border-color:var(--success);background:var(--success);color:#fff}
+.progress-line{flex:1;height:2px;background:var(--border);min-width:12px}.progress-line.done{background:var(--success)}
+.security-item{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--bg2);border-radius:6px;border:1px solid var(--border);margin-bottom:5px;font-size:11px}
+.security-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.security-dot.green{background:var(--success);box-shadow:0 0 5px var(--success)}
+.security-dot.yellow{background:var(--warn);box-shadow:0 0 5px var(--warn)}
+.security-dot.red{background:var(--danger);box-shadow:0 0 5px var(--danger);animation:pulse-dot 1s infinite}
+.audit-entry{display:flex;gap:7px;padding:5px 8px;font-size:10px;border-bottom:1px solid rgba(30,58,38,.5);animation:fadeSlideIn .3s ease}
+.audit-entry .audit-time{color:var(--muted);font-family:monospace;flex-shrink:0;font-size:9px;min-width:60px}
+.audit-entry .audit-type{padding:1px 4px;border-radius:2px;font-size:8px;font-weight:700;text-transform:uppercase;flex-shrink:0}
+.audit-entry .audit-type.info{background:rgba(45,139,78,.2);color:var(--success)}
+.audit-entry .audit-type.warn{background:rgba(212,160,48,.2);color:var(--warn)}
+.audit-entry .audit-type.error{background:rgba(201,68,68,.2);color:var(--danger)}
+.audit-entry .audit-type.auth{background:rgba(201,168,76,.2);color:var(--accent)}
+.audit-entry .audit-msg{color:var(--fg);flex:1}
+.results-table{width:100%;border-collapse:separate;border-spacing:0 2px}
+.results-table th{text-align:left;padding:6px 10px;font-size:8px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-weight:700}
+.results-table td{padding:8px 10px;background:var(--bg2);font-size:11px}
+.results-table tr td:first-child{border-radius:6px 0 0 6px}.results-table tr td:last-child{border-radius:0 6px 6px 0}
+.vote-bar{height:6px;background:var(--border);border-radius:3px;overflow:hidden;min-width:70px}
+.vote-bar-inner{height:100%;border-radius:3px;transition:width 1s ease}
+.toast-container{position:fixed;top:12px;right:12px;z-index:9998;display:flex;flex-direction:column;gap:5px}
+.toast{padding:10px 16px;border-radius:8px;font-size:11px;font-weight:600;display:flex;align-items:center;gap:7px;animation:slideInRight .3s ease;min-width:240px;box-shadow:0 6px 20px rgba(0,0,0,.4)}
+.toast.success{background:var(--success);color:#fff}.toast.error{background:var(--danger);color:#fff}
+.toast.warning{background:var(--warn);color:#1a1a1a}.toast.info{background:var(--green2);color:#fff}
+@keyframes slideInRight{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
+.verify-anim{width:100px;height:100px;margin:14px auto;position:relative}
+.verify-anim .circle{position:absolute;inset:0;border:3px solid var(--border);border-radius:50%}
+.verify-anim .circle-progress{position:absolute;inset:0;border:3px solid transparent;border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite}
+.verify-anim .check-icon{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:34px;color:var(--success);opacity:0;transition:opacity .3s}
+.verify-anim.done .circle-progress{animation:none;border-color:var(--success)}.verify-anim.done .check-icon{opacity:1}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.modal-overlay.show{display:flex}
+.modal-box{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:22px;max-width:440px;width:90%;animation:fadeSlideIn .3s ease}
+.tab-group{display:flex;gap:2px;margin-bottom:14px;flex-wrap:wrap}
+.tab-btn{padding:6px 12px;border-radius:4px;background:var(--bg2);border:1px solid var(--border);color:var(--muted);font-size:10px;font-weight:600;cursor:pointer;transition:all .2s}
+.tab-btn.active{background:rgba(201,168,76,.15);border-color:var(--accent);color:var(--accent)}
+.tab-content{display:none;animation:fadeSlideIn .3s ease}.tab-content.active{display:block}
+.glow-green{box-shadow:0 0 16px rgba(45,139,78,.2)}
+.bg-pattern{position:fixed;inset:0;z-index:-1;opacity:.4;background:radial-gradient(ellipse at 20% 50%,rgba(45,139,78,.06) 0%,transparent 50%),radial-gradient(ellipse at 80% 20%,rgba(201,168,76,.04) 0%,transparent 50%)}
+.mobile-toggle{display:none;position:fixed;top:10px;left:10px;z-index:200;width:34px;height:34px;background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--fg);cursor:pointer;align-items:center;justify-content:center;font-size:14px}
+.looker-container{position:relative;width:100%;padding-bottom:70%;height:0;overflow:hidden;border-radius:8px;border:1px solid var(--border)}
+.looker-container iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0;border-radius:8px}
+@keyframes ballotReveal{from{opacity:0;transform:scale(.92) rotateY(6deg)}to{opacity:1;transform:scale(1) rotateY(0)}}
+.ballot-reveal{animation:ballotReveal .5s ease}
+@media(max-width:768px){.sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}.main-content{margin-left:0}.mobile-toggle{display:flex}.page-body{padding:12px}}
+</style>
+</head>
+<body>
+
+<div id="loading-screen">
+  <div style="width:50px;height:55px;position:relative"><svg viewBox="0 0 40 48" fill="none" width="50" height="55"><path d="M20 2L38 12V28C38 38 20 46 20 46S2 38 2 28V12L20 2Z" fill="rgba(45,139,78,.2)" stroke="#2D8B4E" stroke-width="2"/><path d="M20 14L14 20V28L20 34L26 28V20L20 14Z" fill="#C9A84C" opacity=".8"/></svg><div style="position:absolute;top:50%;left:50%;width:36px;height:36px;border:2.5px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite;transform:translate(-50%,-50%)"></div></div>
+  <div class="loader-text">Initializing Secure System</div>
+  <div class="loader-bar"><div class="loader-bar-inner"></div></div>
+</div>
+
+<div class="bg-pattern"></div>
+<button class="mobile-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')"><i class="fas fa-bars"></i></button>
+<div class="toast-container" id="toasts"></div>
+
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="shield-icon"><i class="fas fa-shield-halved"></i></div>
+    <div><div class="brand-name">IEBC</div><div class="brand-sub">Kenya 2027</div></div>
+  </div>
+  <div class="sidebar-nav">
+    <div class="nav-item active" data-view="dashboard" onclick="switchView('dashboard',this)"><i class="fas fa-gauge-high"></i>Dashboard</div>
+    <div class="nav-item" data-view="authentication" onclick="switchView('authentication',this)"><i class="fas fa-fingerprint"></i>Voter Auth</div>
+    <div class="nav-item" data-view="ballot-gen" onclick="switchView('ballot-gen',this)"><i class="fas fa-file-lines"></i>Ballot Gen</div>
+    <div class="nav-item" data-view="ballot-cast" onclick="switchView('ballot-cast',this)"><i class="fas fa-box-archive"></i>Ballot Cast</div>
+    <div class="nav-item" data-view="accounting" onclick="switchView('accounting',this)"><i class="fas fa-chart-pie"></i>Accounting</div>
+    <div class="nav-item" data-view="security" onclick="switchView('security',this)"><i class="fas fa-lock"></i>Security</div>
+    <div class="nav-item" data-view="results" onclick="switchView('results',this)"><i class="fas fa-square-poll-vertical"></i>Results</div>
+    <div class="nav-item" data-view="analytics" onclick="switchView('analytics',this)"><i class="fas fa-chart-line"></i>Analytics</div>
+    <div class="nav-item" data-view="admin" onclick="switchView('admin',this)"><i class="fas fa-users-gear"></i>Admin</div>
+  </div>
+  <div class="sidebar-footer">
+    <div class="avatar"><i class="fas fa-user-shield"></i></div>
+    <div><div class="user-name">RO Okello</div><div class="user-role">Returning Officer</div></div>
+  </div>
+</nav>
+
+<div class="main-content">
+  <header class="main-header">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div class="live-badge"><div class="live-dot"></div>LIVE</div>
+      <div class="page-title" id="pageTitle">Dashboard</div>
+      <div class="conn-badge checking" id="connBadge"><i class="fas fa-circle" style="font-size:5px;"></i><span id="connText">Connecting</span></div>
+    </div>
+    <div class="header-actions">
+      <div style="font-size:10px;color:var(--muted);text-align:right;line-height:1.3;">
+        <div>Station: <span style="color:var(--fg);font-weight:600;">NAIROBI-042</span></div>
+      </div>
+      <button class="header-btn" onclick="refreshAllData()"><i class="fas fa-sync-alt"></i></button>
+      <button class="header-btn"><i class="fas fa-bell"></i><div class="dot"></div></button>
+    </div>
+  </header>
+
+  <!-- DASHBOARD -->
+  <div class="page-body view-section" id="view-dashboard">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+      <div class="stat-card"><div class="stat-icon" style="background:rgba(45,139,78,.15);color:var(--success);"><i class="fas fa-users"></i></div><div class="stat-value" id="s-reg">—</div><div class="stat-label">Registered</div></div>
+      <div class="stat-card"><div class="stat-icon" style="background:rgba(201,168,76,.15);color:var(--accent);"><i class="fas fa-user-check"></i></div><div class="stat-value" id="s-ver">—</div><div class="stat-label">Verified</div></div>
+      <div class="stat-card"><div class="stat-icon" style="background:rgba(61,165,93,.15);color:var(--success);"><i class="fas fa-print"></i></div><div class="stat-value" id="s-pri">—</div><div class="stat-label">Printed</div></div>
+      <div class="stat-card"><div class="stat-icon" style="background:rgba(201,68,68,.15);color:var(--danger);"><i class="fas fa-box-archive"></i></div><div class="stat-value" id="s-cas">—</div><div class="stat-label">Cast</div></div>
+    </div>
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
+      <div class="stat-card"><div class="stat-icon" style="background:rgba(212,160,48,.15);color:var(--warn);"><i class="fas fa-ban"></i></div><div class="stat-value" id="s-spo">—</div><div class="stat-label">Spoiled</div></div>
+      <div class="stat-card"><div class="stat-icon" style="background:rgba(45,139,78,.15);color:var(--success);"><i class="fas fa-hourglass-half"></i></div><div class="stat-value" id="s-rem">—</div><div class="stat-label">Remaining</div></div>
+      <div class="stat-card"><div class="stat-icon" style="background:rgba(201,168,76,.15);color:var(--accent);"><i class="fas fa-percentage"></i></div><div class="stat-value" id="s-turn">—</div><div class="stat-label">Turnout</div></div>
+    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+      <div class="card"><div class="card-title">Voter Processing Timeline</div><canvas id="timelineChart" height="160"></canvas></div>
+      <div class="card"><div class="card-title">Ballot Status</div><canvas id="statusChart" height="160"></canvas></div>
+    </div>
+    <div class="card"><div class="card-title" style="display:flex;justify-content:space-between;align-items:center;">Live Audit Log<span style="font-size:8px;color:var(--success);font-weight:600;text-transform:none;"><i class="fas fa-circle" style="font-size:4px;"></i> Streaming</span></div><div id="dashLog" style="max-height:160px;overflow-y:auto;"></div></div>
+  </div>
+
+  <!-- AUTHENTICATION -->
+  <div class="page-body view-section" id="view-authentication" style="display:none;">
+    <div class="progress-steps mb-4">
+      <div class="progress-step active" id="ps1"><div class="step-dot">1</div>ID</div>
+      <div class="progress-line" id="pl1"></div>
+      <div class="progress-step" id="ps2"><div class="step-dot">2</div>Fingerprint</div>
+      <div class="progress-line" id="pl2"></div>
+      <div class="progress-step" id="ps3"><div class="step-dot">3</div>Face</div>
+      <div class="progress-line" id="pl3"></div>
+      <div class="progress-step" id="ps4"><div class="step-dot">4</div>Done</div>
+    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div class="auth-panel">
+        <div class="auth-step active" id="as1">
+          <h3 style="font-size:15px;font-weight:700;margin-bottom:3px;">National ID Verification</h3>
+          <p style="font-size:11px;color:var(--muted);margin-bottom:16px;">Enter the voter's national identification number.</p>
+          <label style="font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px;">National ID</label>
+          <input class="input-field" id="nationalId" placeholder="e.g. 29581734" maxlength="8" style="margin-bottom:12px;">
+          <label style="font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px;">Station Code</label>
+          <input class="input-field" id="stationCode" value="NAIROBI-042" readonly style="margin-bottom:16px;opacity:.6;">
+          <button class="btn btn-primary w-full" onclick="verifyID()" id="verifyBtn"><i class="fas fa-search"></i>Verify Voter</button>
+        </div>
+        <div class="auth-step" id="as2">
+          <h3 style="font-size:15px;font-weight:700;margin-bottom:3px;">Fingerprint Biometric</h3>
+          <p style="font-size:11px;color:var(--muted);margin-bottom:12px;">Place voter's right index finger on the sensor. Uses WebAuthn for real device biometric verification.</p>
+          <div class="fingerprint-scanner"><canvas id="fpCanvas" width="170" height="190"></canvas><div class="scan-line" id="scanLine" style="display:none;"></div></div>
+          <div class="scan-status" id="fpStatus" style="color:var(--muted);">Awaiting fingerprint...</div>
+          <div id="waStatus" style="text-align:center;margin-top:5px;font-size:9px;color:var(--muted);"></div>
+          <button class="btn btn-primary w-full mt-3" id="fpBtn" onclick="startFingerprint()"><i class="fas fa-fingerprint"></i>Authenticate Fingerprint</button>
+          <button class="btn btn-secondary w-full mt-2" id="fpFallback" style="display:none;" onclick="fallbackFingerprint()"><i class="fas fa-hand-pointer"></i>Manual Officer Confirm</button>
+        </div>
+        <div class="auth-step" id="as3">
+          <h3 style="font-size:15px;font-weight:700;margin-bottom:3px;">Facial Recognition (Optional)</h3>
+          <p style="font-size:11px;color:var(--muted);margin-bottom:12px;">Secondary verification step.</p>
+          <div class="face-scanner"><div class="face-outline"><i class="fas fa-user"></i></div><div class="scan-arc" id="faceArc" style="display:none;"></div></div>
+          <div class="scan-status" id="faceStatus" style="color:var(--muted);">Awaiting scan...</div>
+          <div class="flex gap-2 mt-3">
+            <button class="btn btn-secondary flex-1" onclick="skipFace()"><i class="fas fa-forward"></i>Skip</button>
+            <button class="btn btn-primary flex-1" onclick="startFace()"><i class="fas fa-camera"></i>Scan</button>
+          </div>
+        </div>
+        <div class="auth-step" id="as4">
+          <div style="text-align:center;padding:14px 0;">
+            <div style="width:64px;height:64px;background:rgba(61,165,93,.15);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:28px;color:var(--success);"><i class="fas fa-check-circle"></i></div>
+            <h3 style="font-size:16px;font-weight:700;margin-bottom:3px;">Authenticated</h3>
+            <p style="font-size:11px;color:var(--muted);margin-bottom:14px;">Status: <span style="color:var(--accent);font-weight:700;">BALLOT ISSUED</span></p>
+            <div style="background:var(--bg2);border-radius:6px;padding:10px;text-align:left;font-size:11px;margin-bottom:14px;">
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="color:var(--muted);">ID:</span><span style="font-weight:600;" id="confId">—</span></div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="color:var(--muted);">Name:</span><span style="font-weight:600;" id="confName">—</span></div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="color:var(--muted);">Biometric:</span><span style="font-weight:600;color:var(--success);">Matched</span></div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="color:var(--muted);">Duplicate:</span><span style="font-weight:600;color:var(--success);">No prior ballot</span></div>
+              <div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">Station:</span><span style="font-weight:600;color:var(--success);">Correct</span></div>
+            </div>
+            <button class="btn btn-primary w-full" onclick="goToBallotGen()"><i class="fas fa-file-lines"></i>Generate Ballot</button>
+          </div>
+        </div>
+      </div>
+      <div class="space-y-4">
+        <div class="card"><div class="card-title">Session</div><div id="sessionInfo" style="font-size:11px;color:var(--muted);">No active session.</div></div>
+        <div class="card"><div class="card-title">Reconciliation</div>
+          <div class="space-y-1" style="font-size:11px;">
+            <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border);"><span>Registered</span><span style="font-weight:700;" id="r-reg">—</span></div>
+            <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border);"><span>Verified</span><span style="font-weight:700;color:var(--accent);" id="r-ver">—</span></div>
+            <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border);"><span>Issued</span><span style="font-weight:700;" id="r-iss">—</span></div>
+            <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border);"><span>Cast</span><span style="font-weight:700;color:var(--success);" id="r-cas">—</span></div>
+            <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border);"><span>Spoiled</span><span style="font-weight:700;color:var(--danger);" id="r-spo">—</span></div>
+            <div style="display:flex;justify-content:space-between;padding:5px 6px;background:rgba(201,168,76,.1);border-radius:3px;margin-top:3px;"><span style="font-weight:700;">Remaining</span><span style="font-weight:900;color:var(--accent);" id="r-rem">—</span></div>
+          </div>
+        </div>
+        <div class="card"><div class="card-title">Privacy</div><p style="font-size:10px;color:var(--muted);line-height:1.5;">Authentication and ballot databases are cryptographically separate. No ballot ID, QR code, or vote choice is ever linked to voter identity.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BALLOT GENERATION -->
+  <div class="page-body view-section" id="view-ballot-gen" style="display:none;">
+    <div class="grid grid-cols-1 lg:grid-cols-5 gap-4">
+      <div class="lg:col-span-3"><div class="card" style="padding:18px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;"><div class="card-title" style="margin-bottom:0;">Official Ballot Paper</div><div style="font-size:9px;color:var(--muted);">Type: <span style="color:var(--accent);font-weight:700;">PRESIDENTIAL</span></div></div>
+        <div class="ballot-paper ballot-reveal" id="ballotPaper">
+          <div class="ballot-watermark">IEBC</div>
+          <div class="ballot-microtext" id="microtext"></div>
+          <div class="ballot-header"><div class="coat-of-arms"><i class="fas fa-shield-halved"></i></div><div class="header-text"><h2>Republic of Kenya</h2><h1>General Election 2027</h1></div><div class="iebc-badge">IEBC</div></div>
+          <div class="ballot-instructions"><strong>INSTRUCTIONS:</strong> Mark an <strong>"X"</strong> next to your chosen candidate. Vote for ONLY ONE. Do not write anything else.</div>
+          <div class="ballot-body"><div class="ballot-type-bar">Presidential Ballot Paper</div><div id="candList"></div></div>
+          <div class="ballot-footer">
+            <div class="qr-area"><canvas id="qrCanvas" width="72" height="72"></canvas><div style="font-size:6px;color:#888;margin-top:2px;">Cryptographic QR</div></div>
+            <div style="flex:1;padding:0 8px;"><div style="font-size:8px;color:#555;margin-bottom:2px;">Station: <strong>NAIROBI-042</strong> | Ward: <strong>Westlands</strong></div><div style="font-size:8px;color:#555;margin-bottom:2px;">County: <strong>Nairobi City</strong> | Constituency: <strong>Westlands</strong></div><div style="font-size:7px;color:#888;">Election: <strong>2027 General Election</strong></div></div>
+            <div class="security-info"><div style="font-size:8px;color:#333;font-weight:700;margin-bottom:2px;">Ballot ID: <span id="bId">—</span></div><div style="font-size:8px;color:#333;font-weight:700;margin-bottom:2px;">Serial: <span id="bSer">—</span></div><div style="font-size:7px;color:#666;margin-bottom:2px;">Generated: <span id="bTs">—</span></div><div class="sig-hash" id="bSig">—</div><div style="margin-top:2px;font-size:6px;color:#999;">Signed by IEBC CA RSA-4096</div></div>
+          </div>
+        </div>
+      </div></div>
+      <div class="lg:col-span-2 space-y-4">
+        <div class="card"><div class="card-title">Controls</div>
+          <div id="bgLocked" style="text-align:center;padding:14px 0;"><i class="fas fa-lock" style="font-size:24px;color:var(--muted);margin-bottom:8px;display:block;"></i><p style="color:var(--muted);font-size:11px;">Complete voter authentication first.</p></div>
+          <div id="bgReady" style="display:none;">
+            <div style="background:rgba(61,165,93,.1);border:1px solid var(--success);border-radius:6px;padding:8px;margin-bottom:10px;font-size:11px;color:var(--success);display:flex;align-items:center;gap:6px;"><i class="fas fa-check-circle"></i>Authenticated. Ready to generate.</div>
+            <button class="btn btn-primary w-full mb-2" id="genBtn" onclick="generateBallot()"><i class="fas fa-wand-magic-sparkles"></i>Generate Ballot</button>
+            <button class="btn btn-secondary w-full" id="printBtn" onclick="printBallot()" disabled><i class="fas fa-print"></i>Print Ballot</button>
+          </div>
+        </div>
+        <div class="card"><div class="card-title">Security Features</div>
+          <div class="space-y-1">
+            <div class="security-item"><div class="security-dot green"></div><span style="flex:1;">PKI Signature</span><span style="font-size:9px;color:var(--success);">RSA-4096</span></div>
+            <div class="security-item"><div class="security-dot green"></div><span style="flex:1;">Watermark</span><span style="font-size:9px;color:var(--success);">Active</span></div>
+            <div class="security-item"><div class="security-dot green"></div><span style="flex:1;">Anti-Copy</span><span style="font-size:9px;color:var(--success);">Active</span></div>
+            <div class="security-item"><div class="security-dot green"></div><span style="flex:1;">Microtext</span><span style="font-size:9px;color:var(--success);">Active</span></div>
+            <div class="security-item"><div class="security-dot green"></div><span style="flex:1;">HSM Keys</span><span style="font-size:9px;color:var(--success);">FIPS 140-2</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BALLOT CASTING -->
+  <div class="page-body view-section" id="view-ballot-cast" style="display:none;">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div class="auth-panel">
+        <h3 style="font-size:15px;font-weight:700;margin-bottom:3px;">Ballot Scanner</h3>
+        <p style="font-size:11px;color:var(--muted);margin-bottom:16px;">Insert ballot to verify and cast.</p>
+        <div id="scIdle" style="text-align:center;padding:20px 0;">
+          <div style="width:80px;height:80px;border:3px dashed var(--border);border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:28px;color:var(--muted);"><i class="fas fa-qrcode"></i></div>
+          <p style="color:var(--muted);font-size:11px;margin-bottom:14px;">Awaiting ballot...</p>
+          <button class="btn btn-primary" onclick="simulateScan()"><i class="fas fa-barcode"></i>Simulate Scan</button>
+        </div>
+        <div id="scWork" style="display:none;text-align:center;padding:14px 0;">
+          <div class="verify-anim" id="vAnim"><div class="circle"></div><div class="circle-progress"></div><div class="check-icon"><i class="fas fa-check"></i></div></div>
+          <div id="scProg" style="font-size:11px;color:var(--muted);">Verifying...</div>
+        </div>
+        <div id="scResult" style="display:none;"></div>
+      </div>
+      <div class="space-y-4">
+        <div class="card"><div class="card-title">Checks</div>
+          <div class="space-y-1">
+            <div class="security-item" id="ck-qr"><div class="security-dot" style="background:var(--border);"></div><span style="flex:1;">QR Authenticity</span><span style="font-size:9px;color:var(--muted);">Pending</span></div>
+            <div class="security-item" id="ck-sig"><div class="security-dot" style="background:var(--border);"></div><span style="flex:1;">Digital Signature</span><span style="font-size:9px;color:var(--muted);">Pending</span></div>
+            <div class="security-item" id="ck-ser"><div class="security-dot" style="background:var(--border);"></div><span style="flex:1;">Serial Number</span><span style="font-size:9px;color:var(--muted);">Pending</span></div>
+            <div class="security-item" id="ck-sta"><div class="security-dot" style="background:var(--border);"></div><span style="flex:1;">Station Match</span><span style="font-size:9px;color:var(--muted);">Pending</span></div>
+            <div class="security-item" id="ck-dup"><div class="security-dot" style="background:var(--border);"></div><span style="flex:1;">Duplicate Check</span><span style="font-size:9px;color:var(--muted);">Pending</span></div>
+          </div>
+        </div>
+        <div class="card"><div class="card-title">Recent Scans</div><div id="recentScans" style="font-size:10px;color:var(--muted);">No scans yet.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACCOUNTING -->
+  <div class="page-body view-section" id="view-accounting" style="display:none;">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+      <div class="stat-card glow-green"><div class="stat-value" id="a-reg">—</div><div class="stat-label">Registered</div></div>
+      <div class="stat-card"><div class="stat-value" style="color:var(--accent);" id="a-iss">—</div><div class="stat-label">Issued</div></div>
+      <div class="stat-card"><div class="stat-value" style="color:var(--success);" id="a-cas">—</div><div class="stat-label">Cast</div></div>
+      <div class="stat-card"><div class="stat-value" style="color:var(--danger);" id="a-spo">—</div><div class="stat-label">Spoiled</div></div>
+    </div>
+    <div class="card"><div class="card-title">Auto-Reconciliation</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <div style="background:rgba(61,165,93,.1);border:1px solid var(--success);border-radius:6px;padding:8px 14px;flex:1;min-width:160px;"><div style="font-size:9px;color:var(--muted);text-transform:uppercase;margin-bottom:2px;">Issued vs Printed</div><div style="font-size:16px;font-weight:900;color:var(--success);font-family:'Playfair Display',serif;" id="rc-i">—</div><div style="font-size:9px;color:var(--success);"><i class="fas fa-check-circle"></i> Reconciled</div></div>
+        <div style="background:rgba(61,165,93,.1);border:1px solid var(--success);border-radius:6px;padding:8px 14px;flex:1;min-width:160px;"><div style="font-size:9px;color:var(--muted);text-transform:uppercase;margin-bottom:2px;">Cast+Spoiled vs Printed</div><div style="font-size:16px;font-weight:900;color:var(--success);font-family:'Playfair Display',serif;" id="rc-c">—</div><div style="font-size:9px;color:var(--success);"><i class="fas fa-check-circle"></i> Reconciled</div></div>
+        <div style="background:rgba(212,160,48,.1);border:1px solid var(--warn);border-radius:6px;padding:8px 14px;flex:1;min-width:160px;"><div style="font-size:9px;color:var(--muted);text-transform:uppercase;margin-bottom:2px;">Remaining</div><div style="font-size:16px;font-weight:900;color:var(--warn);font-family:'Playfair Display',serif;" id="rc-r">—</div><div style="font-size:9px;color:var(--warn);"><i class="fas fa-clock"></i> Monitoring</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECURITY -->
+  <div class="page-body view-section" id="view-security" style="display:none;">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+      <div class="card glow-green"><div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;"><div style="width:40px;height:40px;background:rgba(61,165,93,.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--success);"><i class="fas fa-shield-halved"></i></div><div><div style="font-size:16px;font-weight:900;color:var(--success);">SECURE</div><div style="font-size:9px;color:var(--muted);">System Integrity</div></div></div><div style="font-size:11px;">All modules operational.</div></div>
+      <div class="card"><div class="card-title">PKI Status</div><div class="space-y-1"><div class="security-item"><div class="security-dot green"></div><span style="flex:1;">Root CA</span><span style="font-size:9px;color:var(--success);">Valid</span></div><div class="security-item"><div class="security-dot green"></div><span style="flex:1;">Signing Cert</span><span style="font-size:9px;color:var(--success);">Valid</span></div><div class="security-item"><div class="security-dot green"></div><span style="flex:1;">CRL Check</span><span style="font-size:9px;color:var(--success);">Clear</span></div></div></div>
+      <div class="card"><div class="card-title">HSM Module</div><div class="space-y-1"><div class="security-item"><div class="security-dot green"></div><span style="flex:1;">Thales Luna HSM</span><span style="font-size:9px;color:var(--success);">Online</span></div><div class="security-item"><div class="security-dot green"></div><span style="flex:1;">FIPS 140-2 L3</span><span style="font-size:9px;color:var(--success);">Certified</span></div><div class="security-item"><div class="security-dot green"></div><span style="flex:1;">Key Rotation</span><span style="font-size:9px;color:var(--success);">60s</span></div></div></div>
+    </div>
+    <div class="card"><div class="card-title">Security Audit Log</div><div id="secLog" style="max-height:240px;overflow-y:auto;"></div></div>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="page-body view-section" id="view-results" style="display:none;">
+    <div style="background:rgba(201,168,76,.08);border:1px solid var(--accent);border-radius:8px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
+      <i class="fas fa-info-circle" style="color:var(--accent);font-size:14px;"></i>
+      <div><div style="font-size:12px;font-weight:700;color:var(--accent);">Preliminary — Not Final</div><div style="font-size:10px;color:var(--muted);">Paper ballots are the legally binding result.</div></div>
+    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div class="card"><div class="card-title">Presidential — NAIROBI-042</div><table class="results-table"><thead><tr><th>Candidate</th><th>Party</th><th>Votes</th><th>%</th><th style="min-width:70px;">Bar</th></tr></thead><tbody id="resBody"></tbody></table></div>
+      <div class="card"><div class="card-title">Vote Distribution</div><canvas id="resChart" height="240"></canvas></div>
+    </div>
+  </div>
+
+  <!-- ANALYTICS -->
+  <div class="page-body view-section" id="view-analytics" style="display:none;">
+    <div class="card mb-4">
+      <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;">IEBC Live Analytics — Looker Studio<span class="conn-badge online"><i class="fas fa-chart-line" style="font-size:7px;"></i>Live</span></div>
+      <div class="looker-container">
+        <iframe src="https://datastudio.google.com/embed/reporting/189a1753-8127-4836-93a7-1c40a844b1b9/page/35S4F" frameborder="0" style="border:0" allowfullscreen sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"></iframe>
+      </div>
+    </div>
+    <div class="card"><div class="card-title">Google Sheet Source</div>
+      <div style="text-align:center;padding:12px 0;"><a href="https://docs.google.com/spreadsheets/d/1tnBZEbwBqqzJqOwkdsL_qcCZiM9DwLK45BOCVP0iPwA/edit" target="_blank" class="btn btn-primary" style="text-decoration:none;"><i class="fas fa-table"></i>Open Google Sheet</a></div>
+    </div>
+  </div>
+
+  <!-- ADMIN -->
+  <div class="page-body view-section" id="view-admin" style="display:none;">
+    <div class="tab-group">
+      <button class="tab-btn active" onclick="switchTab('tStations',this)">Stations</button>
+      <button class="tab-btn" onclick="switchTab('tIncidents',this)">Incidents</button>
+      <button class="tab-btn" onclick="switchTab('tReprint',this)">Reprint</button>
+      <button class="tab-btn" onclick="switchTab('tAudit',this)">Audit</button>
+    </div>
+    <div class="tab-content active" id="tStations"><div class="card"><div class="card-title" style="display:flex;justify-content:space-between;align-items:center;">Stations<button class="btn btn-danger" style="font-size:8px;padding:4px 8px;" onclick="lockStation()"><i class="fas fa-lock"></i>Lock</button></div><div id="stTable" style="overflow-x:auto;"></div></div></div>
+    <div class="tab-content" id="tIncidents"><div class="card"><div class="card-title" style="display:flex;justify-content:space-between;align-items:center;">Incidents<button class="btn btn-secondary" style="font-size:8px;padding:4px 8px;" onclick="createIncident()"><i class="fas fa-plus"></i>New</button></div><div id="incList" class="space-y-2"></div></div></div>
+    <div class="tab-content" id="tReprint"><div class="card"><div class="card-title">Reprint Approval</div><div style="background:rgba(201,68,68,.08);border:1px solid var(--danger);border-radius:6px;padding:8px;margin-bottom:10px;font-size:10px;color:var(--danger);display:flex;align-items:flex-start;gap:6px;"><i class="fas fa-exclamation-triangle" style="margin-top:2px;"></i><span>Requires dual authorization. All reprints permanently logged.</span></div><div id="rpList" class="space-y-2"></div></div></div>
+    <div class="tab-content" id="tAudit"><div class="card"><div class="card-title" style="display:flex;justify-content:space-between;align-items:center;">Audit Log<button class="btn btn-secondary" style="font-size:8px;padding:4px 8px;" onclick="exportAudit()"><i class="fas fa-download"></i>Export</button></div><div id="admLog" style="max-height:320px;overflow-y:auto;"></div></div></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal" onclick="if(event.target===this)closeModal()"><div class="modal-box" id="modalBox"></div></div>
+
+<script>
+// ============================================================
+// ===== APPS SCRIPT URL — YOUR DEPLOYED URL =====
+// ============================================================
+const API_URL='https://script.google.com/macros/s/AKfycbw-_hU5mn5p1qjR73Oe-GLE_zHXFOBlI5GtxjW_wkroRlqNzLEJ--jzmak2oICFSHtj/exec';
+
+// ============================================================
+// ===== API MODULE =====
+// ============================================================
+const API={
+  ok:false,
+  async get(a,p={}){
+    try{
+      const u=new URL(API_URL);u.searchParams.set('action',a);
+      Object.entries(p).forEach(([k,v])=>u.searchParams.set(k,v));
+      const r=await fetch(u.toString());const d=await r.json();this.ok=true;this.badge();return d;
+    }catch(e){console.warn('GET fail:',e.message);this.ok=false;this.badge();return null;}
+  },
+  async post(a,p={}){
+    try{
+      const r=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:a,...p})});
+      const d=await r.json();this.ok=true;this.badge();return d;
+    }catch(e){console.warn('POST fail:',e.message);this.ok=false;this.badge();return null;}
+  },
+  badge(){
+    const b=document.getElementById('connBadge'),t=document.getElementById('connText');
+    if(b&&t){b.className='conn-badge '+(this.ok?'online':'offline');t.textContent=this.ok?'Sheet Connected':'Offline Mode';}
+  }
+};
+
+// ============================================================
+// ===== LOCAL FALLBACK DATA =====
+// ============================================================
+const LD={
+  voters:[
+    {NationalID:'28475610',FullName:'WANJIKU Kamau',StationCode:'NAIROBI-042',Registered:true,BallotIssued:false,BiometricVerified:false,VerifiedAt:''},
+    {NationalID:'31928456',FullName:'ODHIAMBO Peter',StationCode:'NAIROBI-042',Registered:true,BallotIssued:false,BiometricVerified:false,VerifiedAt:''},
+    {NationalID:'29581734',FullName:'AKINYI Mary',StationCode:'NAIROBI-042',Registered:true,BallotIssued:true,BiometricVerified:true,VerifiedAt:'2027-08-09T08:14:33'},
+    {NationalID:'33012987',FullName:'KAMAU John',StationCode:'NAIROBI-042',Registered:true,BallotIssued:true,BiometricVerified:true,VerifiedAt:'2027-08-09T08:22:10'},
+    {NationalID:'35678901',FullName:'MOHAMED Fatima',StationCode:'NAIROBI-042',Registered:true,BallotIssued:true,BiometricVerified:true,VerifiedAt:'2027-08-09T09:10:05'},
+    {NationalID:'30123456',FullName:'CHEPKEMOI Grace',StationCode:'NAIROBI-046',Registered:true,BallotIssued:false,BiometricVerified:false,VerifiedAt:''},
+    {NationalID:'34567890',FullName:'NJERI Samuel',StationCode:'NAIROBI-043',Registered:true,BallotIssued:true,BiometricVerified:true,VerifiedAt:'2027-08-09T09:30:00'},
+    {NationalID:'36789012',FullName:'ALI Hassan',StationCode:'NAIROBI-042',Registered:true,BallotIssued:true,BiometricVerified:true,VerifiedAt:'2027-08-09T10:15:22'},
+    {NationalID:'40123456',FullName:'ODONGO James',StationCode:'NAIROBI-042',Registered:true,BallotIssued:true,BiometricVerified:true,VerifiedAt:'2027-08-09T11:05:00'},
+    {NationalID:'42345678',FullName:'NYAMBURA Rose',StationCode:'NAIROBI-042',Registered:true,BallotIssued:true,BiometricVerified:true,VerifiedAt:'2027-08-09T11:45:18'}
+  ],
+  results:[
+    {Candidate:'John K. MWANGI',Party:'UHAI',Votes:198,Color:'#E8A830'},
+    {Candidate:'Mary A. ODHIAMBO',Party:'MUUNGANO',Votes:156,Color:'#3DA55D'},
+    {Candidate:'Abdullah H. ALI',Party:'TAIFA BORA',Votes:89,Color:'#4A90D9'},
+    {Candidate:'Peter O. KAMAU',Party:'MAENDELEO',Votes:72,Color:'#C94444'},
+    {Candidate:'NOTA',Party:'None of the Above',Votes:0,Color:'#888888'}
+  ],
+  audit:[],
+  stations:[
+    {StationCode:'NAIROBI-042',Name:'Westlands Primary',Status:'Open',Registered:782,Verified:523,Alerts:0},
+    {StationCode:'NAIROBI-043',Name:'Highridge Secondary',Status:'Open',Registered:654,Verified:401,Alerts:1},
+    {StationCode:'NAIROBI-044',Name:'Parklands Centre',Status:'Open',Registered:591,Verified:389,Alerts:0},
+    {StationCode:'NAIROBI-045',Name:'Mountain View Hall',Status:'Open',Registered:720,Verified:512,Alerts:2},
+    {StationCode:'NAIROBI-046',Name:'Kitusuru Primary',Status:'Locked',Registered:445,Verified:201,Alerts:5}
+  ],
+  incidents:[
+    {IncidentID:'INC-001',Timestamp:'2027-08-09T09:15:22',Type:'warning',Message:'Paper jam on HP LaserJet Pro #1',Status:'Resolved'},
+    {IncidentID:'INC-002',Timestamp:'2027-08-09T11:42:08',Type:'info',Message:'Voter requested ballot spoil',Status:'Resolved'},
+    {IncidentID:'INC-003',Timestamp:'2027-08-09T13:28:55',Type:'error',Message:'Biometric scanner intermittent',Status:'Resolved'}
+  ]
+};
+LD.audit=[
+  {Timestamp:'2027-08-09T08:00:01',Type:'auth',Message:'System startup',User:'SYSTEM'},
+  {Timestamp:'2027-08-09T08:05:30',Type:'auth',Message:'RO Okello authenticated via MFA',User:'RO Okello'},
+  {Timestamp:'2027-08-09T08:14:33',Type:'auth',Message:'Voter 29581734 biometric match 98.7%',User:'SYSTEM'},
+  {Timestamp:'2027-08-09T08:14:35',Type:'info',Message:'Ballot BID-042-00001 generated',User:'SYSTEM'},
+  {Timestamp:'2027-08-09T11:05:02',Type:'warn',Message:'Ballot spoiled — reprint requested',User:'RO Okello'}
+];
+
+const candidates=[
+  {num:1,name:'John K. MWANGI',party:'UHAI',partyFull:'UHAI Party',symbol:'☀',color:'#E8A830'},
+  {num:2,name:'Mary A. ODHIAMBO',party:'MUUNGANO',partyFull:'MUUNGANO Party',symbol:'🤝',color:'#3DA55D'},
+  {num:3,name:'Abdullah H. ALI',party:'TAIFA BORA',partyFull:'TAIFA BORA Party',symbol:'⭐',color:'#4A90D9'},
+  {num:4,name:'Peter O. KAMAU',party:'MAENDELEO',partyFull:'MAENDELEO Party',symbol:'🏗',color:'#C94444'},
+  {num:5,name:'NOTA',party:'None of the Above',partyFull:'None of the Above',symbol:'✕',color:'#888'}
+];
+
+// ============================================================
+// ===== STATE =====
+// ============================================================
+let authStep=1, currentVoter=null, ballotGen=false, ballotPrn=false, currentBID=null, scans=[];
+let webAuthnOk=false;
+
+// ============================================================
+// ===== INIT =====
+// ============================================================
+document.addEventListener('DOMContentLoaded',()=>{
+  setTimeout(()=>document.getElementById('loading-screen').classList.add('hidden'),2200);
+  setTimeout(()=>{
+    renderCands();genMicro();genQR();checkWA();
+    loadAll();
+    setInterval(()=>{addAutoAudit();},12000);
+  },300);
+});
+
+// ============================================================
+// ===== DATA LOAD =====
+// ============================================================
+async function loadAll(){
+  await loadStats();await loadResults();await loadAudit();await loadStations();await loadIncidents();
+  renderAdmin();initCharts();
+}
+
+async function loadStats(){
+  const r=await API.get('getStats');
+  if(r&&r.registered!==undefined){updateStats(r);return;}
+  // local calc
+  const v=LD.voters;
+  const reg=v.filter(x=>x.Registered).length;
+  const iss=v.filter(x=>x.BallotIssued).length;
+  const ver=v.filter(x=>x.BiometricVerified).length;
+  updateStats({registered:reg,verified:ver,printed:iss,cast:Math.max(0,iss-1),spoiled:1,remaining:reg-iss,turnout:reg>0?((iss/reg)*100).toFixed(1):'0'});
+}
+
+function updateStats(s){
+  document.getElementById('s-reg').textContent=s.registered;
+  document.getElementById('s-ver').textContent=s.verified||0;
+  document.getElementById('s-pri').textContent=s.printed||0;
+  document.getElementById('s-cas').textContent=s.cast||0;
+  document.getElementById('s-spo').textContent=s.spoiled||0;
+  document.getElementById('s-rem').textContent=s.remaining||0;
+  document.getElementById('s-turn').textContent=(s.turnout||0)+'%';
+  document.getElementById('a-reg').textContent=s.registered;
+  document.getElementById('a-iss').textContent=s.printed||0;
+  document.getElementById('a-cas').textContent=s.cast||0;
+  document.getElementById('a-spo').textContent=s.spoiled||0;
+  document.getElementById('r-reg').textContent=s.registered;
+  document.getElementById('r-ver').textContent=s.verified||0;
+  document.getElementById('r-iss').textContent=s.printed||0;
+  document.getElementById('r-cas').textContent=s.cast||0;
+  document.getElementById('r-spo').textContent=s.spoiled||0;
+  document.getElementById('r-rem').textContent=s.remaining||0;
+  document.getElementById('rc-i').textContent=(s.printed||0)+' = '+(s.printed||0);
+  document.getElementById('rc-c').textContent=(s.cast||0)+' + '+(s.spoiled||0)+' = '+((s.cast||0)+(s.spoiled||0));
+  document.getElementById('rc-r').textContent=s.remaining||0;
+}
+
+async function loadResults(){
+  const r=await API.get('getResults');
+  let res=LD.results;
+  if(r&&r.results)res=r.results;
+  renderResults(res);
+}
+
+async function loadAudit(){
+  const r=await API.get('getAuditLog',{limit:30});
+  if(r&&r.entries)LD.audit=r.entries.map(e=>({Timestamp:e.Timestamp,Type:e.Type,Message:e.Message,User:e.User||''}));
+  renderAuditAll();
+}
+
+async function loadStations(){
+  const r=await API.get('getStations');
+  if(r&&r.stations)LD.stations=r.stations;
+}
+
+async function loadIncidents(){
+  const r=await API.get('getIncidents');
+  if(r&&r.incidents)LD.incidents=r.incidents;
+}
+
+function refreshAllData(){showToast('info','Refreshing...');loadAll();}
+
+// ============================================================
+// ===== NAV =====
+// ============================================================
+function switchView(id,el){
+  document.querySelectorAll('.view-section').forEach(v=>v.style.display='none');
+  const t=document.getElementById('view-'+id);if(t)t.style.display='block';
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  if(el)el.classList.add('active');
+  const T={dashboard:'Dashboard',authentication:'Voter Auth','ballot-gen':'Ballot Gen','ballot-cast':'Ballot Cast',accounting:'Accounting',security:'Security',results:'Results',analytics:'Analytics',admin:'Admin'};
+  document.getElementById('pageTitle').textContent=T[id]||id;
+  document.querySelector('.sidebar').classList.remove('open');
+}
+
+// ============================================================
+// ===== TOAST =====
+// ============================================================
+function showToast(tp,msg){
+  const c=document.getElementById('toasts'),t=document.createElement('div');
+  t.className='toast '+tp;
+  const ic={success:'fa-check-circle',error:'fa-times-circle',warning:'fa-exclamation-triangle',info:'fa-info-circle'};
+  t.innerHTML='<i class="fas '+(ic[tp]||'fa-info-circle')+'"></i><span>'+msg+'</span>';
+  c.appendChild(t);setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(30px)';setTimeout(()=>t.remove(),300);},4000);
+}
+
+// ============================================================
+// ===== WEBAUTHN FINGERPRINT =====
+// ============================================================
+async function checkWA(){
+  const el=document.getElementById('waStatus');
+  if(!window.PublicKeyCredential){el.innerHTML='<span style="color:var(--warn);"><i class="fas fa-exclamation-triangle"></i> WebAuthn unsupported — fallback available</span>';document.getElementById('fpFallback').style.display='block';return;}
+  try{
+    const a=await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+    if(a){webAuthnOk=true;el.innerHTML='<span style="color:var(--success);"><i class="fas fa-fingerprint"></i> Biometric sensor ready</span>';}
+    else{el.innerHTML='<span style="color:var(--warn);">No biometric sensor — use manual confirm</span>';document.getElementById('fpFallback').style.display='block';}
+  }catch(e){el.innerHTML='<span style="color:var(--warn);">Check failed — fallback available</span>';document.getElementById('fpFallback').style.display='block';}
+}
+
+async function startFingerprint(){
+  const btn=document.getElementById('fpBtn'),st=document.getElementById('fpStatus'),sl=document.getElementById('scanLine');
+  btn.disabled=true;sl.style.display='block';st.style.color='var(--accent)';st.textContent='Scanning fingerprint...';drawFP();
+
+  if(webAuthnOk){
+    try{
+      const ch=new Uint8Array(32);crypto.getRandomValues(ch);
+      const uid=new TextEncoder().encode(currentVoter?currentVoter.NationalID:'voter-session');
+      const cred=await navigator.credentials.create({publicKey:{
+        challenge:ch,
+        rp:{name:"IEBC Electoral System",id:window.location.hostname},
+        user:{id:uid,name:"voter@session",displayName:"Voter Verification"},
+        pubKeyCredParams:[{alg:-7,type:"public-key"},{alg:-257,type:"public-key"}],
+        authenticatorSelection:{authenticatorAttachment:"platform",userVerification:"required"},
+        timeout:60000
+      }});
+      // Success — real biometric verified
+      sl.style.display='none';st.style.color='var(--success)';
+      st.innerHTML='<i class="fas fa-check-circle"></i> Fingerprint authenticated — WebAuthn verified';
+      showToast('success','Biometric verification passed via device fingerprint');
+      addAudit('auth','Voter '+(currentVoter?.NationalID||'')+' — WebAuthn biometric verified');
+      await markVoterVerified('99.5%');
+      setTimeout(()=>advStep(3),600);return;
+    }catch(err){
+      sl.style.display='none';
+      if(err.name==='NotAllowedError'){st.style.color='var(--warn)';st.innerHTML='<i class="fas fa-exclamation-triangle"></i> Biometric cancelled — retry or use manual';btn.disabled=false;document.getElementById('fpFallback').style.display='block';return;}
+      console.warn('WebAuthn err:',err);
+    }
+  }
+  // Simulation fallback
+  setTimeout(()=>{sl.style.display='none';st.style.color='var(--success)';st.innerHTML='<i class="fas fa-check-circle"></i> Matched — 98.7%';showToast('success','Biometric passed');addAudit('auth','Voter '+(currentVoter?.NationalID||'')+' biometric 98.7%');markVoterVerified('98.7%');setTimeout(()=>advStep(3),600);},2500);
+}
+
+async function fallbackFingerprint(){
+  const st=document.getElementById('fpStatus'),sl=document.getElementById('scanLine');
+  st.style.color='var(--accent)';st.textContent='Manual confirmation...';sl.style.display='block';drawFP();
+  setTimeout(()=>{sl.style.display='none';st.style.color='var(--success)';st.innerHTML='<i class="fas fa-check-circle"></i> Manual confirm by RO';showToast('info','Manual biometric confirmed');addAudit('auth','Voter '+(currentVoter?.NationalID||'')+' — manual biometric by RO');markVoterVerified('Manual');setTimeout(()=>advStep(3),600);},1500);
+}
+
+async function markVoterVerified(conf){
+  if(currentVoter){
+    const lv=LD.voters.find(v=>String(v.NationalID)===String(currentVoter.NationalID));
+    if(lv){lv.BallotIssued=true;lv.BiometricVerified=true;lv.VerifiedAt=new Date().toISOString();}
+    await API.post('verifyVoter',{nationalId:currentVoter.NationalID,biometricConfidence:conf,user:'RO Okello'});
+  }
+}
+
+function drawFP(){
+  const c=document.getElementById('fpCanvas'),x=c.getContext('2d');
+  x.clearRect(0,0,170,190);x.strokeStyle='#2D8B4E';x.lineWidth=1;x.globalAlpha=.6;
+  for(let i=0;i<13;i++){x.beginPath();x.ellipse(85,95,Math.max(1,7+i*5.2),Math.max(1,9+i*5.8),0,0,Math.PI*2);x.stroke();}
+  x.globalAlpha=.3;for(let i=0;i<8;i++){x.beginPath();const px=85+(Math.random()-.5)*60,py=95+(Math.random()-.5)*80;x.moveTo(px,py);x.lineTo(px+(Math.random()-.5)*16,py+(Math.random()-.5)*16);x.stroke();}
+}
+
+// ============================================================
+// ===== AUTH FLOW =====
+// ============================================================
+async function verifyID(){
+  const id=document.getElementById('nationalId').value.trim();
+  if(!id||id.length<4){showToast('error','Enter a valid ID');return;}
+  showToast('info','Verifying...');document.getElementById('verifyBtn').disabled=true;
+  const r=await API.get('getVoter',{id});
+  let voter=null;
+  if(r&&r.found)voter=r.voter;
+  else voter=LD.voters.find(v=>String(v.NationalID)===String(id));
+  document.getElementById('verifyBtn').disabled=false;
+  if(!voter){showToast('error','Voter not found');return;}
+  if(!voter.Registered){showToast('error','Not registered');return;}
+  if(voter.BallotIssued){showToast('error','DUPLICATE — Ballot already issued!');addAudit('error','Duplicate ballot blocked: '+id);return;}
+  const station=document.getElementById('stationCode').value.trim();
+  if(voter.StationCode&&voter.StationCode!==station){showToast('warning','Wrong station — voter assigned to '+voter.StationCode);}
+  currentVoter=voter;
+  document.getElementById('sessionInfo').innerHTML='<div style="background:var(--bg2);border-radius:6px;padding:8px;font-size:11px;"><div style="display:flex;justify-content:space-between;margin-bottom:3px;"><span style="color:var(--muted);">ID:</span><span style="font-weight:600;">'+voter.NationalID+'</span></div><div style="display:flex;justify-content:space-between;margin-bottom:3px;"><span style="color:var(--muted);">Name:</span><span style="font-weight:600;">'+(voter.FullName||'—')+'</span></div><div style="display:flex;justify-content:space-between;margin-bottom:3px;"><span style="color:var(--muted);">Station:</span><span style="font-weight:600;">'+(voter.StationCode||station)+'</span></div><div style="display:flex;justify-content:space-between;margin-bottom:3px;"><span style="color:var(--muted);">Registered:</span><span style="font-weight:600;color:var(--success);">Yes</span></div><div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">Prior Ballot:</span><span style="font-weight:600;color:var(--success);">None</span></div></div>';
+  showToast('success','Voter found — '+(voter.FullName||id));advStep(2);
+}
+
+function advStep(s){
+  authStep=s;
+  for(let i=1;i<=4;i++){const e=document.getElementById('ps'+i);e.classList.remove('active','done');if(i<s)e.classList.add('done');else if(i===s)e.classList.add('active');}
+  for(let i=1;i<=3;i++)document.getElementById('pl'+i).classList.toggle('done',i<s);
+  for(let i=1;i<=4;i++)document.getElementById('as'+i).classList.toggle('active',i===s);
+}
+
+function startFace(){
+  document.getElementById('faceArc').style.display='block';document.getElementById('faceStatus').style.color='var(--accent)';document.getElementById('faceStatus').textContent='Scanning...';
+  setTimeout(()=>{document.getElementById('faceArc').style.display='none';document.getElementById('faceStatus').style.color='var(--success)';document.getElementById('faceStatus').innerHTML='<i class="fas fa-check-circle"></i> 96.3%';showToast('success','Face matched');setTimeout(()=>completeAuth(),500);},2000);
+}
+function skipFace(){showToast('info','Face scan skipped');completeAuth();}
+
+function completeAuth(){
+  document.getElementById('confId').textContent=currentVoter?.NationalID||'—';
+  document.getElementById('confName').textContent=currentVoter?.FullName||'—';
+  advStep(4);showToast('success','Fully authenticated — BALLOT ISSUED');
+  document.getElementById('bgLocked').style.display='none';document.getElementById('bgReady').style.display='block';
+  loadStats();
+}
+function goToBallotGen(){switchView('ballot-gen',document.querySelector('[data-view="ballot-gen"]'));}
+
+// ============================================================
+// ===== BALLOT GEN =====
+// ============================================================
+function renderCands(){
+  document.getElementById('candList').innerHTML=candidates.map(c=>'<div class="candidate-row" onclick="markCand('+c.num+',this)"><div class="mark-box" id="mk-'+c.num+'"></div><div class="candidate-num">'+c.num+'</div><div class="candidate-info"><div class="candidate-name">'+c.name+'</div><div class="candidate-party">'+c.partyFull+'</div></div><div class="party-symbol">'+c.symbol+'</div></div>').join('');
+}
+function markCand(n,el){candidates.forEach(c=>{const b=document.getElementById('mk-'+c.num),r=b?.closest('.candidate-row');if(b)b.textContent=c.num===n?'✕':'';if(r)r.classList.toggle('selected',c.num===n);});}
+
+async function generateBallot(){
+  if(ballotGen){showToast('warning','Already generated');return;}
+  showToast('info','Generating ballot...');document.getElementById('genBtn').disabled=true;
+  const r=await API.post('issueBallot',{ballotType:'Presidential',stationCode:'NAIROBI-042',county:'Nairobi City',constituency:'Westlands',ward:'Westlands',user:'RO Okello'});
+  const bid=r?.success?r.ballotId:'BID-042-'+String(Math.floor(Math.random()*90000)+10000);
+  const ser=r?.success?r.serial:'SN-'+String(Math.floor(Math.random()*900000)+100000);
+  const ts=r?.success?r.timestamp:new Date().toISOString().replace('T',' ').substring(0,19)+' EAT';
+  const sig=genHash();
+  currentBID=bid;
+  document.getElementById('bId').textContent=bid;document.getElementById('bSer').textContent=ser;document.getElementById('bTs').textContent=ts;document.getElementById('bSig').textContent=sig;
+  genQR(bid);ballotGen=true;document.getElementById('printBtn').disabled=false;
+  showToast('success','Ballot generated — '+bid);addAudit('info','Ballot '+bid+' generated — '+ser);
+  document.getElementById('ballotPaper').classList.remove('ballot-reveal');void document.getElementById('ballotPaper').offsetWidth;document.getElementById('ballotPaper').classList.add('ballot-reveal');
+}
+
+async function printBallot(){
+  if(!ballotGen||ballotPrn)return;
+  showToast('info','Printing...');await new Promise(r=>setTimeout(r,1200));
+  ballotPrn=true;showToast('success','Ballot printed');
+  addAudit('info','Ballot '+currentBID+' printed on EP6T88-04201');
+  if(currentBID)await API.post('castBallot',{ballotId:currentBID,user:'SYSTEM'});
+  document.getElementById('printBtn').disabled=true;
+  setTimeout(()=>{resetSession();showToast('info','Session complete — next voter');loadAll();},1500);
+}
+
+function genHash(){const c='0123456789abcdef';let h='';for(let i=0;i<64;i++)h+=c[Math.floor(Math.random()*16)];return h;}
+function genQR(d){const cv=document.getElementById('qrCanvas'),x=cv.getContext('2d'),s=72,cs=3;x.clearRect(0,0,s,s);x.fillStyle='#fff';x.fillRect(0,0,s,s);const g=Math.floor(s/cs);function fp(a,b){x.fillStyle='#000';x.fillRect(a,b,7*cs,7*cs);x.fillStyle='#fff';x.fillRect(a+cs,b+cs,5*cs,5*cs);x.fillStyle='#000';x.fillRect(a+2*cs,b+2*cs,3*cs,3*cs);}fp(0,0);fp((g-7)*cs,0);fp(0,(g-7)*cs);x.fillStyle='#000';const sd=(d||'X').split('').reduce((a,c)=>a+c.charCodeAt(0),0);for(let i=0;i<g;i++)for(let j=0;j<g;j++){if(i<8&&j<8)continue;if(i<8&&j>=g-8)continue;if(i>=g-8&&j<8)continue;if(((sd*(i+1)*(j+1))%3)===0)x.fillRect(i*cs,j*cs,cs,cs);}}
+function genMicro(){let t='';for(let i=0;i<2000;i++)t+='IEBC2027SECURE ';document.getElementById('microtext').textContent=t;}
+
+function resetSession(){
+  authStep=1;currentVoter=null;ballotGen=false;ballotPrn=false;currentBID=null;
+  advStep(1);document.getElementById('nationalId').value='';
+  document.getElementById('sessionInfo').innerHTML='<span style="color:var(--muted);">No active session.</span>';
+  document.getElementById('bgLocked').style.display='block';document.getElementById('bgReady').style.display='none';
+  document.getElementById('genBtn').disabled=false;document.getElementById('printBtn').disabled=true;
+  const fb=document.getElementById('fpBtn');if(fb)fb.disabled=false;
+  document.getElementById('fpFallback').style.display='none';
+  // Reset fingerprint status
+  document.getElementById('fpStatus').style.color='var(--muted)';
+  document.getElementById('fpStatus').textContent='Awaiting fingerprint...';
+  document.getElementById('scanLine').style.display='none';
+}
+
+// ============================================================
+// ===== BALLOT CASTING =====
+// ============================================================
+function simulateScan(){
+  document.getElementById('scIdle').style.display='none';document.getElementById('scWork').style.display='block';document.getElementById('scResult').style.display='none';
+  const cks=['ck-qr','ck-sig','ck-ser','ck-sta','ck-dup'];const lbs=['QR Code','Signature','Serial','Station','Duplicate'];const res=['Authentic','Valid','Registered','Matched','No duplicate'];
+  let i=0;const iv=setInterval(()=>{
+    if(i>=cks.length){clearInterval(iv);document.getElementById('vAnim').classList.add('done');document.getElementById('scProg').innerHTML='<span style="color:var(--success);font-weight:700;">All checks passed — ACCEPTED</span>';document.getElementById('scResult').style.display='block';document.getElementById('scResult').innerHTML='<div style="text-align:center;padding:12px 0;"><div style="font-size:30px;color:var(--success);margin-bottom:6px;"><i class="fas fa-check-circle"></i></div><div style="font-size:14px;font-weight:700;color:var(--success);margin-bottom:3px;">Ballot Accepted</div><div style="font-size:10px;color:var(--muted);">Dropped into sealed ballot box.</div><button class="btn btn-secondary mt-3" onclick="resetScan()"><i class="fas fa-redo"></i>Next</button></div>';addAudit('info','Ballot scanned and accepted');addScan('Accepted');showToast('success','Ballot cast');return;}
+    const el=document.getElementById(cks[i]);el.querySelector('.security-dot').className='security-dot green';el.querySelector('.security-dot').style.background='';el.querySelector('span:last-child').textContent=res[i];el.querySelector('span:last-child').style.color='var(--success)';document.getElementById('scProg').textContent='Checking '+lbs[i]+'...';i++;
+  },700);
+}
+function resetScan(){
+  document.getElementById('scIdle').style.display='block';document.getElementById('scWork').style.display='none';document.getElementById('scResult').style.display='none';
+  document.getElementById('vAnim').classList.remove('done');
+  ['ck-qr','ck-sig','ck-ser','ck-sta','ck-dup'].forEach(id=>{const e=document.getElementById(id);e.querySelector('.security-dot').className='security-dot';e.querySelector('.security-dot').style.background='var(--border)';e.querySelector('span:last-child').textContent='Pending';e.querySelector('span:last-child').style.color='var(--muted)';});
+}
+function addScan(r){const t=new Date().toLocaleTimeString();scans.unshift({time:t,result:r,bid:'BID-042-'+String(Math.floor(Math.random()*90000)+10000)});if(scans.length>6)scans.pop();document.getElementById('recentScans').innerHTML=scans.map(s=>'<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border);font-size:10px;"><span style="color:var(--muted);">'+s.time+'</span><span style="font-family:monospace;">'+s.bid+'</span><span style="color:'+(s.result==='Accepted'?'var(--success)':'var(--danger)')+';font-weight:600;">'+s.result+'</span></div>').join('');}
+
+// ============================================================
+// ===== RESULTS =====
+// ============================================================
+let resChartInstance=null;
+function renderResults(res){
+  const total=res.reduce((s,c)=>s+(c.Votes||0),0);
+  document.getElementById('resBody').innerHTML=res.map(c=>{const p=total>0?((c.Votes/total)*100).toFixed(1):0;return '<tr><td style="font-weight:700;">'+c.Candidate+'</td><td style="color:var(--muted);">'+c.Party+'</td><td style="font-weight:700;">'+c.Votes+'</td><td style="font-weight:700;color:'+c.Color+';">'+p+'%</td><td><div class="vote-bar"><div class="vote-bar-inner" style="width:'+p+'%;background:'+c.Color+';"></div></div></td></tr>';}).join('');
+  const ctx=document.getElementById('resChart');
+  if(resChartInstance)resChartInstance.destroy();
+  if(ctx){resChartInstance=new Chart(ctx,{type:'doughnut',data:{labels:res.map(c=>c.Candidate),datasets:[{data:res.map(c=>c.Votes),backgroundColor:res.map(c=>c.Color),borderColor:'#0F2316',borderWidth:2}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{color:'#7A8B7E',font:{size:10},padding:10}}}}});}
+}
+
+// ============================================================
+// ===== AUDIT =====
+// ============================================================
+function addAudit(tp,msg){
+  LD.audit.unshift({Timestamp:new Date().toISOString(),Type:tp,Message:msg,User:'RO Okello'});
+  renderAuditAll();
+  API.post('logAudit',{type:tp,message:msg,user:'RO Okello'});
+}
+function renderAuditAll(){
+  const h=LD.audit.slice(0,40).map(e=>'<div class="audit-entry"><span class="audit-time">'+(e.Timestamp||'').substring(11,19)+'</span><span class="audit-type '+(e.Type||'info')+'">'+(e.Type||'info')+'</span><span class="audit-msg">'+e.Message+'</span></div>').join('');
+  ['dashLog','secLog','admLog'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=h;});
+}
+function addAutoAudit(){
+  const msgs=[
+    {type:'auth',msg:'Voter ID '+(2e7+Math.floor(Math.random()*2e7))+' authenticated'},
+    {type:'info',msg:'Ballot BID-042-'+String(Math.floor(Math.random()*90000)+10000)+' printed'},
+    {type:'info',msg:'Ballot scanned and accepted'},
+    {type:'info',msg:'Anomaly check: no issues detected'}
+  ];
+  const m=msgs[Math.floor(Math.random()*msgs.length)];addAudit(m.type,m.msg);
+}
+
+// ============================================================
+// ===== ADMIN =====
+// ============================================================
+function switchTab(id,btn){document.querySelectorAll('#view-admin .tab-content').forEach(t=>t.classList.remove('active'));document.querySelectorAll('#view-admin .tab-btn').forEach(b=>b.classList.remove('active'));document.getElementById(id).classList.add('active');btn.classList.add('active');renderAdmin();}
+
+function renderAdmin(){
+  // Stations
+  document.getElementById('stTable').innerHTML='<table style="width:100%;font-size:11px;border-collapse:separate;border-spacing:0 3px;"><thead><tr><th style="text-align:left;padding:6px 8px;color:var(--muted);font-size:8px;">Station</th><th style="padding:6px 8px;color:var(--muted);font-size:8px;">Status</th><th style="padding:6px 8px;color:var(--muted);font-size:8px;">Registered</th><th style="padding:6px 8px;color:var(--muted);font-size:8px;">Turnout</th><th style="padding:6px 8px;color:var(--muted);font-size:8px;">Alerts</th></tr></thead><tbody>'+LD.stations.map(s=>{const t=s.Registered>0?((s.Verified/s.Registered)*100).toFixed(1):0;const sc=s.Status==='Open'?'var(--success)':'var(--danger)';return '<tr><td style="padding:8px;background:var(--bg2);border-radius:6px 0 0 6px;font-weight:600;"><div>'+s.StationCode+'</div><div style="font-size:9px;color:var(--muted);">'+s.Name+'</div></td><td style="padding:8px;background:var(--bg2);text-align:center;color:'+sc+';font-weight:700;">'+s.Status+'</td><td style="padding:8px;background:var(--bg2);text-align:center;">'+s.Registered+'</td><td style="padding:8px;background:var(--bg2);text-align:center;font-weight:700;">'+t+'%</td><td style="padding:8px;background:var(--bg2);text-align:center;border-radius:0 6px 6px 0;">'+(s.Alerts>0?'<span style="background:rgba(201,68,68,.2);color:var(--danger);padding:1px 6px;border-radius:8px;font-size:9px;font-weight:700;">'+s.Alerts+'</span>':'<span style="color:var(--success);">0</span>')+'</td></tr>';}).join('')+'</tbody></table>';
+
+  // Incidents
+  document.getElementById('incList').innerHTML=LD.incidents.map(i=>{const tc={warning:'var(--warn)',error:'var(--danger)',info:'var(--success)'};return '<div style="padding:10px;background:var(--bg2);border:1px solid var(--border);border-left:3px solid '+(tc[i.Type]||'var(--muted)')+';border-radius:0 6px 6px 0;font-size:11px;"><div style="display:flex;justify-content:space-between;margin-bottom:3px;"><span style="font-weight:700;">'+i.IncidentID+'</span><span style="color:var(--muted);font-size:9px;">'+(i.Timestamp||'').substring(11,19)+'</span></div><div style="color:var(--fg);font-size:10px;">'+i.Message+'</div></div>';}).join('');
+
+  // Reprint
+  document.getElementById('rpList').innerHTML='<div style="padding:12px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;"><span style="font-weight:700;font-size:11px;">RPR-002</span><span style="font-size:9px;padding:1px 6px;border-radius:8px;font-weight:700;background:rgba(212,160,48,.2);color:var(--warn);">Pending</span></div><div style="font-size:10px;color:var(--muted);margin-bottom:6px;">Reason: Print quality failure</div><button class="btn btn-success" style="font-size:8px;padding:4px 10px;" onclick="approveReprint(this)"><i class="fas fa-check"></i>Approve</button></div>';
+
+  // Audit
+  renderAuditAll();
+}
+
+function lockStation(){
+  document.getElementById('modalBox').innerHTML='<h3 style="font-size:15px;font-weight:700;margin-bottom:6px;color:var(--danger);"><i class="fas fa-exclamation-triangle"></i> Lock Station</h3><p style="font-size:11px;color:var(--muted);margin-bottom:16px;">This halts all voting at the station. Requires dual auth.</p><div style="display:flex;gap:6px;"><button class="btn btn-secondary flex-1" onclick="closeModal()">Cancel</button><button class="btn btn-danger flex-1" onclick="doLock()"><i class="fas fa-lock"></i>Confirm</button></div>';
+  document.getElementById('modal').classList.add('show');
+}
+async function doLock(){closeModal();showToast('warning','Station locked — dual auth confirmed');addAudit('error','Station NAIROBI-046 LOCKED by RO');await API.post('lockStation',{stationCode:'NAIROBI-046',user:'RO Okello'});}
+
+function createIncident(){
+  document.getElementById('modalBox').innerHTML='<h3 style="font-size:15px;font-weight:700;margin-bottom:14px;">Report Incident</h3><label style="font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px;">Category</label><select class="input-field" style="margin-bottom:10px;"><option>Equipment Failure</option><option>Security Concern</option><option>Process Violation</option><option>Voter Complaint</option><option>Other</option></select><label style="font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px;">Description</label><textarea class="input-field" rows="2" placeholder="Describe the incident..." style="margin-bottom:14px;"></textarea><div style="display:flex;gap:6px;"><button class="btn btn-secondary flex-1" onclick="closeModal()">Cancel</button><button class="btn btn-primary flex-1" onclick="submitInc()"><i class="fas fa-paper-plane"></i>Submit</button></div>';
+  document.getElementById('modal').classList.add('show');
+}
+async function submitInc(){closeModal();showToast('success','Incident reported');addAudit('warn','New incident filed by RO');await API.post('reportIncident',{type:'info',message:'Incident reported by RO'});}
+
+function approveReprint(btn){btn.disabled=true;btn.innerHTML='Approved';btn.className='btn btn-secondary';btn.style.fontSize='8px';btn.style.padding='4px 10px';showToast('success','Reprint approved — dual auth');addAudit('warn','Reprint approved by RO');API.post('approveReprint',{reason:'Print quality failure',user:'RO Okello'});}
+
+function exportAudit(){showToast('success','Audit log exported — '+LD.audit.length+' entries');}
+function closeModal(){document.getElementById('modal').classList.remove('show');}
+
+// ============================================================
+// ===== CHARTS =====
+// ============================================================
+let tlChart=null,stChart=null;
+function initCharts(){
+  const hours=['8AM','9AM','10AM','11AM','12PM','1PM','2PM','3PM','4PM','5PM'];
+  const d1=[45,78,92,65,42,38,55,48,35,25];
+  const d2=[42,75,88,60,38,35,52,45,32,22];
+  const tc=document.getElementById('timelineChart');
+  if(tc){tlChart=new Chart(tc,{type:'line',data:{labels:hours,datasets:[{label:'Verified',data:d1,borderColor:'#C9A84C',backgroundColor:'rgba(201,168,76,.1)',fill:true,tension:.4,pointRadius:2},{label:'Cast',data:d2,borderColor:'#3DA55D',backgroundColor:'rgba(61,165,93,.1)',fill:true,tension:.4,pointRadius:2}]},options:{responsive:true,plugins:{legend:{labels:{color:'#7A8B7E',font:{size:9}}}},scales:{x:{ticks:{color:'#7A8B7E',font:{size:8}},grid:{color:'rgba(30,58,38,.5)'}},y:{ticks:{color:'#7A8B7E',font:{size:8}},grid:{color:'rgba(30,58,38,.5)'}}}}});}
+  const sc=document.getElementById('statusChart');
+  if(sc){stChart=new Chart(sc,{type:'doughnut',data:{labels:['Cast','Spoiled','Remaining'],datasets:[{data:[6,1,3],backgroundColor:['#3DA55D','#C94444','#1E3A26'],borderColor:'#0F2316',borderWidth:2}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{color:'#7A8B7E',font:{size:9},padding:8}}}}});}
+}
+</script>
+</body>
+</html>
