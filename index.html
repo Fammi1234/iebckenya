@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>IEBC Secure Electoral Ballot System — Kenya 2027</title>
+<title>SecureVote — Electoral Ballot System</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
@@ -13,336 +13,1326 @@
 :root{--bg:#070F09;--bg2:#0B1A0F;--card:#0F2316;--card2:#132B1A;--accent:#C9A84C;--accent2:#E0C060;--green:#2D8B4E;--green2:#1B6B38;--fg:#E8E6E1;--muted:#7A8B7E;--border:#1E3A26;--danger:#C94444;--success:#3DA55D;--warn:#D4A030}
 *{margin:0;padding:0;box-sizing:border-box}body{font-family:'Source Sans 3',sans-serif;background:var(--bg);color:var(--fg);overflow-x:hidden}h1,h2,h3{font-family:'Playfair Display',serif}
 ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg2)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
-#ls{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .5s,visibility .5s}#ls.h{opacity:0;visibility:hidden;pointer-events:none}
-@keyframes sp{to{transform:rotate(360deg)}}
+@keyframes sp{to{transform:rotate(360deg)}}@keyframes pd{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.3)}}@keyframes fsI{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}@keyframes sD{from{top:0}to{top:100%}}@keyframes sR{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}@keyframes lsw{0%,100%{top:15%}50%{top:85%}}
+
+.inf{width:100%;padding:10px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;color:var(--fg);font-size:12px;font-family:inherit;transition:all .2s;outline:none}.inf:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(201,168,76,.12)}.inf::placeholder{color:var(--muted)}.inf:disabled{opacity:.4}
+.bt{padding:8px 16px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;transition:all .2s;border:none;font-family:inherit;text-transform:uppercase;letter-spacing:1px;display:inline-flex;align-items:center;gap:6px}.bt-p{background:var(--accent);color:#1a1a1a}.bt-p:hover{background:var(--accent2);transform:translateY(-1px)}.bt-s{background:var(--card2);color:var(--fg);border:1px solid var(--border)}.bt-s:hover{border-color:var(--green)}.bt-d{background:var(--danger);color:#fff}.bt-g{background:var(--success);color:#fff}.bt:disabled{opacity:.5;cursor:not-allowed;transform:none}.wf{width:100%}
+.cd{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;position:relative;overflow:hidden}.cd::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:.3}.ct{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;font-weight:600;margin-bottom:8px}
+.sc{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px;transition:all .3s}.sc:hover{border-color:var(--green);transform:translateY(-1px)}.sc .sv{font-size:24px;font-weight:900;color:var(--fg);font-family:'Playfair Display',serif}.sc .sl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+.tc{position:fixed;top:12px;right:12px;z-index:9998;display:flex;flex-direction:column;gap:5px}.tt{padding:10px 16px;border-radius:8px;font-size:11px;font-weight:600;display:flex;align-items:center;gap:7px;animation:sR .3s ease;min-width:240px;box-shadow:0 6px 20px rgba(0,0,0,.4)}.tt.success{background:var(--success);color:#fff}.tt.error{background:var(--danger);color:#fff}.tt.warning{background:var(--warn);color:#1a1a1a}.tt.info{background:var(--green2);color:#fff}
+.sit{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--bg2);border-radius:6px;border:1px solid var(--border);margin-bottom:5px;font-size:11px}.sd2{width:8px;height:8px;border-radius:50%;flex-shrink:0}.sd2.g{background:var(--success);box-shadow:0 0 5px var(--success)}.sd2.r{background:var(--danger);box-shadow:0 0 5px var(--danger);animation:pd 1s infinite}.sd2.y{background:var(--warn);box-shadow:0 0 5px var(--warn)}
+.ae{display:flex;gap:7px;padding:5px 8px;font-size:10px;border-bottom:1px solid rgba(30,58,38,.5);animation:fsI .3s ease}.ae .at{color:var(--muted);font-family:monospace;flex-shrink:0;font-size:9px;min-width:55px}.ae .ay{padding:1px 4px;border-radius:2px;font-size:8px;font-weight:700;text-transform:uppercase;flex-shrink:0}.ae .ay.info{background:rgba(45,139,78,.2);color:var(--success)}.ae .ay.warn{background:rgba(212,160,48,.2);color:var(--warn)}.ae .ay.error{background:rgba(201,68,68,.2);color:var(--danger)}.ae .ay.auth{background:rgba(201,168,76,.2);color:var(--accent)}.ae .am{color:var(--fg);flex:1}
+#loginOverlay{position:fixed;inset:0;z-index:10000;background:var(--bg);display:flex;align-items:center;justify-content:center;transition:opacity .5s,visibility .5s}#loginOverlay.hidden{opacity:0;visibility:hidden;pointer-events:none}
+.login-box{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:32px;width:420px;max-width:90vw;animation:fsI .5s ease}
+.login-box h2{font-size:22px;margin-bottom:4px;color:var(--accent)}.login-box .sub{font-size:11px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:24px}
+.login-role{display:flex;gap:8px;margin-bottom:20px}
+.role-btn{padding:12px;border-radius:8px;background:var(--bg2);border:2px solid var(--border);cursor:pointer;transition:all .2s;text-align:center;flex:1}.role-btn:hover{border-color:var(--accent)}.role-btn.sel{border-color:var(--accent);background:rgba(201,168,76,.1)}.role-btn .ri{font-size:24px;margin-bottom:4px;display:block}.role-btn .rn{font-size:11px;font-weight:700;color:var(--fg)}.role-btn .rd{font-size:9px;color:var(--muted)}
+.login-field{margin-bottom:14px}.login-field label{font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:4px;letter-spacing:1px}
+.login-error{background:rgba(201,68,68,.15);border:2px solid var(--danger);border-radius:8px;padding:12px 16px;font-size:13px;color:var(--danger);margin-bottom:14px;display:none;line-height:1.6;font-weight:600}
+.login-brand{display:flex;align-items:center;gap:10px;margin-bottom:20px}.login-brand .lb-icon{width:44px;height:48px;background:var(--green);border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:20px}.login-brand .lb-name{font-size:16px;font-weight:900;color:var(--accent);font-family:'Playfair Display',serif}.login-brand .lb-sub{font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase}
 .sb{position:fixed;left:0;top:0;bottom:0;width:220px;background:var(--bg2);border-right:1px solid var(--border);z-index:100;display:flex;flex-direction:column;transition:transform .3s;overflow-y:auto}
 .sb-br{padding:14px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:9px}.sb-br .si{width:34px;height:38px;background:var(--green);border-radius:5px;display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:16px;flex-shrink:0}.sb-br .bn{font-size:13px;font-weight:700;color:var(--accent);font-family:'Playfair Display',serif}.sb-br .bs{font-size:8px;color:var(--muted);letter-spacing:2px;text-transform:uppercase}
-.sb-nv{flex:1;padding:8px 5px}.ni{display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:6px;color:var(--muted);cursor:pointer;transition:all .2s;font-size:11px;font-weight:600;margin-bottom:1px}.ni:hover{color:var(--fg);background:rgba(45,139,78,.1)}.ni.act{color:var(--accent);background:rgba(201,168,76,.1);border-left:3px solid var(--accent)}.ni i{width:16px;text-align:center;font-size:12px}.ni .nb{margin-left:auto;background:var(--danger);color:#fff;font-size:8px;padding:1px 5px;border-radius:8px;font-weight:700}
+.sb-nv{flex:1;padding:8px 5px}.ni{display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:6px;color:var(--muted);cursor:pointer;transition:all .2s;font-size:11px;font-weight:600;margin-bottom:1px}.ni:hover{color:var(--fg);background:rgba(45,139,78,.1)}.ni.act{color:var(--accent);background:rgba(201,168,76,.1);border-left:3px solid var(--accent)}.ni i{width:16px;text-align:center;font-size:12px}.ni.admin-only{display:none}.ni.ro-only{display:none}
 .sb-ft{padding:12px;border-top:1px solid var(--border);display:flex;align-items:center;gap:7px}.sb-ft .av{width:28px;height:28px;border-radius:50%;background:var(--green2);display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:11px}.sb-ft .un{color:var(--fg);font-weight:600;font-size:10px}.sb-ft .ur{color:var(--muted);font-size:8px;text-transform:uppercase;letter-spacing:1px}
-.mc{margin-left:220px;min-height:100vh}.mh{position:sticky;top:0;z-index:50;background:rgba(7,15,9,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:10px 20px;display:flex;align-items:center;justify-content:space-between}.pt{font-size:14px;font-weight:700}.ha{display:flex;align-items:center;gap:10px}.hb{width:32px;height:32px;border-radius:6px;background:var(--card);border:1px solid var(--border);color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;font-size:12px;position:relative}.hb:hover{color:var(--accent);border-color:var(--accent)}.hb .dt{position:absolute;top:5px;right:5px;width:5px;height:5px;background:var(--danger);border-radius:50%;border:1.5px solid var(--bg)}
-.lb{display:flex;align-items:center;gap:5px;font-size:9px;font-weight:700;color:var(--danger);text-transform:uppercase;letter-spacing:1px}.ld{width:6px;height:6px;background:var(--danger);border-radius:50%;animation:pd 1.5s infinite}@keyframes pd{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.3)}}
+.mc{margin-left:220px;min-height:100vh}.mh{position:sticky;top:0;z-index:50;background:rgba(7,15,9,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:10px 20px;display:flex;align-items:center;justify-content:space-between}.pt{font-size:14px;font-weight:700}.ha{display:flex;align-items:center;gap:10px}.hb{width:32px;height:32px;border-radius:6px;background:var(--card);border:1px solid var(--border);color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;font-size:12px}.hb:hover{color:var(--accent);border-color:var(--accent)}
+.lb{display:flex;align-items:center;gap:5px;font-size:9px;font-weight:700;color:var(--danger);text-transform:uppercase;letter-spacing:1px}.ld{width:6px;height:6px;background:var(--danger);border-radius:50%;animation:pd 1.5s infinite}
 .cb{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;text-transform:uppercase}.cb.on{background:rgba(61,165,93,.15);color:var(--success)}.cb.of{background:rgba(201,68,68,.15);color:var(--danger)}.cb.ck{background:rgba(201,168,76,.15);color:var(--accent)}
-.pb{padding:16px 20px}
-.cd{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;position:relative;overflow:hidden}.cd::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:.3}.ct{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;font-weight:600;margin-bottom:8px}
-.sc{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px;transition:all .3s}.sc:hover{border-color:var(--green);transform:translateY(-1px)}.sc .si2{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;margin-bottom:8px}.sc .sv{font-size:24px;font-weight:900;color:var(--fg);font-family:'Playfair Display',serif}.sc .sl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px}
-.inf{width:100%;padding:10px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;color:var(--fg);font-size:12px;font-family:inherit;transition:all .2s;outline:none}.inf:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(201,168,76,.12)}.inf::placeholder{color:var(--muted)}.inf:disabled{opacity:.4;cursor:not-allowed}
-.bt{padding:8px 16px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;transition:all .2s;border:none;font-family:inherit;text-transform:uppercase;letter-spacing:1px;display:inline-flex;align-items:center;gap:6px}.bt-p{background:var(--accent);color:#1a1a1a}.bt-p:hover{background:var(--accent2);transform:translateY(-1px)}.bt-s{background:var(--card2);color:var(--fg);border:1px solid var(--border)}.bt-s:hover{border-color:var(--green)}.bt-d{background:var(--danger);color:#fff}.bt-g{background:var(--success);color:#fff}.bt:disabled{opacity:.5;cursor:not-allowed;transform:none}.wf{width:100%}
+.pb2{padding:16px 20px}.vs{display:none}.vs.vis{display:block}
 .ap{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;position:relative;overflow:hidden}
-.asp{display:none;animation:fsI .4s ease}.asp.act{display:block}@keyframes fsI{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-.prs{display:flex;align-items:center;gap:0;margin-bottom:16px}.prs .ps{display:flex;align-items:center;gap:5px;font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:1px;white-space:nowrap}.prs .ps.act{color:var(--accent)}.prs .ps.dn{color:var(--success)}.prs .ps .sd{width:24px;height:24px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:9px;transition:all .3s}.prs .ps.act .sd{border-color:var(--accent);background:rgba(201,168,76,.15);color:var(--accent)}.prs .ps.dn .sd{border-color:var(--success);background:var(--success);color:#fff}.prs .pl{flex:1;height:2px;background:var(--border);min-width:12px}.prs .pl.dn{background:var(--success)}
-.sit{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--bg2);border-radius:6px;border:1px solid var(--border);margin-bottom:5px;font-size:11px;transition:all .3s}.sit.cp{border-color:var(--success);background:rgba(61,165,93,.05)}.sit.cf{border-color:var(--danger);background:rgba(201,68,68,.05)}.sd2{width:8px;height:8px;border-radius:50%;flex-shrink:0;transition:all .3s}.sd2.g{background:var(--success);box-shadow:0 0 5px var(--success)}.sd2.y{background:var(--warn);box-shadow:0 0 5px var(--warn)}.sd2.r{background:var(--danger);box-shadow:0 0 5px var(--danger);animation:pd 1s infinite}
-.ae{display:flex;gap:7px;padding:5px 8px;font-size:10px;border-bottom:1px solid rgba(30,58,38,.5);animation:fsI .3s ease}.ae .at{color:var(--muted);font-family:monospace;flex-shrink:0;font-size:9px;min-width:60px}.ae .ay{padding:1px 4px;border-radius:2px;font-size:8px;font-weight:700;text-transform:uppercase;flex-shrink:0}.ae .ay.info{background:rgba(45,139,78,.2);color:var(--success)}.ae .ay.warn{background:rgba(212,160,48,.2);color:var(--warn)}.ae .ay.error{background:rgba(201,68,68,.2);color:var(--danger)}.ae .ay.auth{background:rgba(201,168,76,.2);color:var(--accent)}.ae .am{color:var(--fg);flex:1}
-.tc{position:fixed;top:12px;right:12px;z-index:9998;display:flex;flex-direction:column;gap:5px}.tt{padding:10px 16px;border-radius:8px;font-size:11px;font-weight:600;display:flex;align-items:center;gap:7px;animation:sR .3s ease;min-width:240px;box-shadow:0 6px 20px rgba(0,0,0,.4)}.tt.success{background:var(--success);color:#fff}.tt.error{background:var(--danger);color:#fff}.tt.warning{background:var(--warn);color:#1a1a1a}.tt.info{background:var(--green2);color:#fff}@keyframes sR{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
+.asp{display:none;animation:fsI .4s ease}.asp.act{display:block}
+.prs{display:flex;align-items:center;gap:0;margin-bottom:16px}.ps{display:flex;align-items:center;gap:5px;font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:1px;white-space:nowrap}.ps.act{color:var(--accent)}.ps.dn{color:var(--success)}.ps .sd{width:24px;height:24px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:9px;transition:all .3s}.ps.act .sd{border-color:var(--accent);background:rgba(201,168,76,.15);color:var(--accent)}.ps.dn .sd{border-color:var(--success);background:var(--success);color:#fff}.pl2{flex:1;height:2px;background:var(--border);min-width:12px}.pl2.dn{background:var(--success)}
+.fps{width:170px;height:190px;margin:14px auto;position:relative;border:2px solid var(--border);border-radius:14px;overflow:hidden;background:var(--bg2)}.fps canvas{width:100%;height:100%}.sl2{position:absolute;left:0;right:0;height:2px;background:var(--accent);box-shadow:0 0 8px var(--accent);animation:sD 2s linear infinite;display:none}.ss2{text-align:center;margin-top:8px;font-size:11px;font-weight:600}
 .cmb{width:100%;max-width:280px;aspect-ratio:1/1;margin:0 auto;position:relative;border-radius:10px;overflow:hidden;background:#000;border:2px solid var(--border)}.cmb video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}.cmb .cov{position:absolute;inset:0;pointer-events:none;z-index:2}.cmb .cr{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:70%;aspect-ratio:3/4;border:2px dashed var(--muted);border-radius:50%;opacity:.5;transition:all .3s}.cmb .cr.det{border-color:var(--success);border-style:solid;opacity:1;box-shadow:0 0 20px rgba(61,165,93,.3)}
 .pt2{width:80px;height:80px;border-radius:8px;border:2px solid var(--border);object-fit:cover;background:var(--bg2)}
-.pco{display:flex;gap:16px;align-items:center;justify-content:center;margin:12px 0;flex-wrap:wrap}.pco .pl2{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;text-align:center;margin-top:4px}.pco .mi{font-size:20px;color:var(--success)}
-.rbn{border-radius:8px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px;font-size:12px}.rbn.cl{background:rgba(201,68,68,.12);border:1px solid var(--danger);color:var(--danger)}.rbn.op{background:rgba(61,165,93,.12);border:1px solid var(--success);color:var(--success)}
-.fps{width:170px;height:190px;margin:14px auto;position:relative;border:2px solid var(--border);border-radius:14px;overflow:hidden;background:var(--bg2)}.fps canvas{width:100%;height:100%}.sl2{position:absolute;left:0;right:0;height:2px;background:var(--accent);box-shadow:0 0 8px var(--accent);animation:sD 2s linear infinite;display:none}@keyframes sD{from{top:0}to{top:100%}}.ss2{text-align:center;margin-top:8px;font-size:11px;font-weight:600}
-.bp{background:#FFFEF5;color:#1a1a1a;border:3px solid #1a1a1a;border-radius:3px;max-width:540px;margin:0 auto;position:relative;font-family:'Source Sans 3',sans-serif;box-shadow:0 6px 28px rgba(0,0,0,.5)}.bp::before{content:'';position:absolute;inset:0;pointer-events:none;z-index:2;background:repeating-linear-gradient(45deg,transparent,transparent 2px,rgba(0,0,0,.012) 2px,rgba(0,0,0,.012) 4px)}.bh2{background:linear-gradient(135deg,#1B5E20,#2E7D32);color:#fff;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid #1a1a1a}.bh2 .coa{width:42px;height:42px;background:rgba(255,255,255,.15);border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid var(--accent);color:var(--accent);font-size:18px}.bh2 .ht{text-align:center;flex:1;padding:0 8px}.bh2 .ht h2{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase}.bh2 .ht h1{font-size:14px;font-weight:900;margin-top:1px;font-family:'Playfair Display',serif}.bh2 .ib{padding:2px 7px;background:var(--accent);color:#1a1a1a;font-size:7px;font-weight:900;letter-spacing:2px;border-radius:2px;text-transform:uppercase}
-.bi2{background:#F5F0E0;padding:7px 12px;border-bottom:1px solid #ccc;font-size:9px;color:#555;line-height:1.4}.bi2 strong{color:#1a1a1a}
-.bb{padding:8px 12px}.bt2{background:#1B5E20;color:#fff;text-align:center;padding:6px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;border-radius:2px}
-.crw{display:flex;align-items:center;gap:8px;padding:8px 9px;border:2px solid #ddd;border-radius:3px;margin-bottom:6px;background:#fff;transition:all .2s;cursor:pointer}.crw:hover{border-color:#1B5E20;background:#F0FFF0}.crw.sel{border-color:#1B5E20;background:#E8F5E9}.crw .mb{width:28px;height:28px;border:2px solid #333;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;color:#1B5E20;flex-shrink:0}.crw .cn{width:20px;height:20px;background:#1B5E20;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}.crw .ci{flex:1}.crw .ci .cna{font-size:12px;font-weight:700;color:#1a1a1a}.crw .ci .cpa{font-size:9px;color:#666;margin-top:1px}.crw .ps2{width:30px;height:30px;border-radius:3px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;border:1px solid #ddd}
-.bf2{border-top:2px solid #1a1a1a;padding:8px 12px;display:flex;align-items:flex-start;justify-content:space-between;background:#FAFAF0}.bf2 .qa{text-align:center}.bf2 .qa canvas{border:1px solid #ccc}.bf2 .si2{font-size:8px;color:#888;text-align:right;line-height:1.4;max-width:220px}.bf2 .si2 .sh{font-family:monospace;font-size:6px;word-break:break-all;color:#555}.bwm{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-30deg);font-size:50px;font-weight:900;color:rgba(0,0,0,.03);pointer-events:none;white-space:nowrap;letter-spacing:8px;z-index:1;font-family:'Playfair Display',serif}
-.scc{width:100%;max-width:340px;aspect-ratio:4/3;margin:0 auto;position:relative;border-radius:12px;overflow:hidden;background:#000;border:2px solid var(--border)}.scc video{width:100%;height:100%;object-fit:cover}.scc canvas{position:absolute;inset:0;width:100%;height:100%}.scc .sov{position:absolute;inset:0;pointer-events:none;z-index:2}.scc .scn{position:absolute;top:15%;left:15%;right:15%;bottom:15%}.scc .scn::before,.scc .scn::after,.scc .scn span::before,.scc .scn span::after{content:'';position:absolute;width:24px;height:24px;border-color:var(--accent);border-style:solid;border-width:0}.scc .scn::before{top:0;left:0;border-top-width:3px;border-left-width:3px;border-top-left-radius:4px}.scc .scn::after{top:0;right:0;border-top-width:3px;border-right-width:3px;border-top-right-radius:4px}.scc .scn span::before{bottom:0;left:0;border-bottom-width:3px;border-left-width:3px;border-bottom-left-radius:4px}.scc .scn span::after{bottom:0;right:0;border-bottom-width:3px;border-right-width:3px;border-bottom-right-radius:4px}.scc .lsr{position:absolute;left:15%;right:15%;height:2px;background:var(--accent);box-shadow:0 0 8px var(--accent);z-index:3;animation:lsw 2s ease-in-out infinite}@keyframes lsw{0%,100%{top:15%}50%{top:85%}}.scc .qf{position:absolute;inset:0;border:3px solid var(--success);border-radius:10px;z-index:4;display:none}.scc .qf.act{display:block}
+.pco{display:flex;gap:16px;align-items:center;justify-content:center;margin:12px 0;flex-wrap:wrap}
+.rbn{border-radius:8px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px;font-size:12px}.rbn.op{background:rgba(61,165,93,.12);border:1px solid var(--success);color:var(--success)}
+.bp{background:#FFFEF5;color:#1a1a1a;border:3px solid #1a1a1a;border-radius:3px;max-width:540px;margin:0 auto 24px;position:relative;font-family:'Source Sans 3',sans-serif;box-shadow:0 6px 28px rgba(0,0,0,.5)}.bp::before{content:'';position:absolute;inset:0;pointer-events:none;z-index:2;background:repeating-linear-gradient(45deg,transparent,transparent 2px,rgba(0,0,0,.012) 2px,rgba(0,0,0,.012) 4px)}
+.bh{background:linear-gradient(135deg,#1B5E20,#2E7D32);color:#fff;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid #1a1a1a}.bh .coa{width:38px;height:38px;background:rgba(255,255,255,.15);border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid #C9A84C;color:#C9A84C;font-size:16px}.bh .ht{text-align:center;flex:1;padding:0 8px}.bh .ht h2{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase}.bh .ht h1{font-size:13px;font-weight:900;margin-top:1px;font-family:'Playfair Display',serif}.bh .ib{padding:2px 6px;background:#C9A84C;color:#1a1a1a;font-size:7px;font-weight:900;letter-spacing:2px;border-radius:2px;text-transform:uppercase}
+.bi{background:#F5F0E0;padding:6px 10px;border-bottom:1px solid #ccc;font-size:9px;color:#555;line-height:1.4}.bi strong{color:#1a1a1a}
+.bbd{padding:8px 10px}.pos-title-bar{background:#1B5E20;color:#fff;text-align:center;padding:5px;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;border-radius:2px}
+.crw{display:flex;align-items:center;gap:8px;padding:7px 8px;border:2px solid #ddd;border-radius:3px;margin-bottom:5px;background:#fff;transition:all .2s;cursor:pointer}.crw:hover{border-color:#1B5E20;background:#F0FFF0}.crw.sel{border-color:#1B5E20;background:#E8F5E9}.crw .mb{width:26px;height:26px;border:2px solid #333;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px;color:#1B5E20;flex-shrink:0}.crw .ci{flex:1}.crw .ci .cna{font-size:11px;font-weight:700;color:#1a1a1a}.crw .ci .cpa{font-size:9px;color:#666;margin-top:1px}.crw .ps2{width:28px;height:28px;border-radius:3px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;border:1px solid #ddd}
+.bf{border-top:2px solid #1a1a1a;padding:6px 10px;display:flex;align-items:flex-start;justify-content:space-between;background:#FAFAF0}.bf .qa{text-align:center}.bf .si2{font-size:8px;color:#888;text-align:right;line-height:1.4;max-width:220px}.bf .si2 .sh{font-family:monospace;font-size:6px;word-break:break-all;color:#555}
+.bwm{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-30deg);font-size:50px;font-weight:900;color:rgba(0,0,0,.03);pointer-events:none;white-space:nowrap;letter-spacing:8px;z-index:1;font-family:'Playfair Display',serif}
+.scc{width:100%;max-width:340px;aspect-ratio:4/3;margin:0 auto;position:relative;border-radius:12px;overflow:hidden;background:#000;border:2px solid var(--border)}.scc video{width:100%;height:100%;object-fit:cover}.scc canvas{position:absolute;inset:0;width:100%;height:100%}.scc .sov{position:absolute;inset:0;pointer-events:none;z-index:2}.scc .scn{position:absolute;top:15%;left:15%;right:15%;bottom:15%}.scc .scn::before,.scc .scn::after,.scc .scn span::before,.scc .scn span::after{content:'';position:absolute;width:24px;height:24px;border-color:var(--accent);border-style:solid;border-width:0}.scc .scn::before{top:0;left:0;border-top-width:3px;border-left-width:3px;border-top-left-radius:4px}.scc .scn::after{top:0;right:0;border-top-width:3px;border-right-width:3px;border-top-right-radius:4px}.scc .scn span::before{bottom:0;left:0;border-bottom-width:3px;border-left-width:3px;border-bottom-left-radius:4px}.scc .scn span::after{bottom:0;right:0;border-bottom-width:3px;border-right-width:3px;border-bottom-right-radius:4px}.scc .lsr{position:absolute;left:15%;right:15%;height:2px;background:var(--accent);box-shadow:0 0 8px var(--accent);z-index:3;animation:lsw 2s ease-in-out infinite}
 .va{width:100px;height:100px;margin:14px auto;position:relative}.va .vc{position:absolute;inset:0;border:3px solid var(--border);border-radius:50%}.va .vp{position:absolute;inset:0;border:3px solid transparent;border-top-color:var(--accent);border-radius:50%;animation:sp 1s linear infinite}.va .vi{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:34px;color:var(--success);opacity:0;transition:opacity .3s}.va.dn .vp{animation:none;border-color:var(--success)}.va.dn .vi{opacity:1}
 .mo{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)}.mo.sh{display:flex}.mb2{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:22px;max-width:500px;width:90%;animation:fsI .3s ease}
-.tg{display:flex;gap:2px;margin-bottom:14px;flex-wrap:wrap}.tb{padding:6px 12px;border-radius:4px;background:var(--bg2);border:1px solid var(--border);color:var(--muted);font-size:10px;font-weight:600;cursor:pointer;transition:all .2s}.tb.act{background:rgba(201,168,76,.15);border-color:var(--accent);color:var(--accent)}
-.tc2{display:none;animation:fsI .3s ease}.tc2.act{display:block}
-.gg{box-shadow:0 0 16px rgba(45,139,78,.2)}
-.bgp{position:fixed;inset:0;z-index:-1;opacity:.4;background:radial-gradient(ellipse at 20% 50%,rgba(45,139,78,.06) 0%,transparent 50%),radial-gradient(ellipse at 80% 20%,rgba(201,168,76,.04) 0%,transparent 50%)}
+.tg{display:flex;gap:2px;margin-bottom:14px;flex-wrap:wrap}.tb{padding:6px 12px;border-radius:4px;background:var(--bg2);border:1px solid var(--border);color:var(--muted);font-size:10px;font-weight:600;cursor:pointer;transition:all .2s}.tb.act{background:rgba(201,168,76,.15);border-color:var(--accent);color:var(--accent)}.tc2{display:none;animation:fsI .3s ease}.tc2.act{display:block}
+.gg{box-shadow:0 0 16px rgba(45,139,78,.2)}.bgp{position:fixed;inset:0;z-index:-1;opacity:.4;background:radial-gradient(ellipse at 20% 50%,rgba(45,139,78,.06) 0%,transparent 50%),radial-gradient(ellipse at 80% 20%,rgba(201,168,76,.04) 0%,transparent 50%)}
 .mtg{display:none;position:fixed;top:10px;left:10px;z-index:200;width:34px;height:34px;background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--fg);cursor:pointer;align-items:center;justify-content:center;font-size:14px}
 .lkc{position:relative;width:100%;padding-bottom:70%;height:0;overflow:hidden;border-radius:8px;border:1px solid var(--border)}.lkc iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0;border-radius:8px}
-.rt{width:100%;border-collapse:separate;border-spacing:0 2px}.rt th{text-align:left;padding:6px 10px;font-size:8px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-weight:700}.rt td{padding:8px 10px;background:var(--bg2);font-size:11px}.rt tr td:first-child{border-radius:6px 0 0 6px}.rt tr td:last-child{border-radius:0 6px 6px 0}.vb{height:6px;background:var(--border);border-radius:3px;overflow:hidden;min-width:70px}.vbi{height:100%;border-radius:3px;transition:width 1s ease}
-@keyframes brl{from{opacity:0;transform:scale(.92) rotateY(6deg)}to{opacity:1;transform:scale(1) rotateY(0)}}.brl{animation:brl .5s ease}
-@media(max-width:768px){.sb{transform:translateX(-100%)}.sb.op2{transform:translateX(0)}.mc{margin-left:0}.mtg{display:flex}.pb{padding:12px}}
+.rt2{width:100%;border-collapse:separate;border-spacing:0 2px}.rt2 th{text-align:left;padding:6px 10px;font-size:8px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-weight:700}.rt2 td{padding:8px 10px;background:var(--bg2);font-size:11px}.rt2 tr td:first-child{border-radius:6px 0 0 6px}.rt2 tr td:last-child{border-radius:0 6px 6px 0}
+@keyframes brl{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}.brl{animation:brl .5s ease}
+@media(max-width:768px){.sb{transform:translateX(-100%)}.sb.op2{transform:translateX(0)}.mc{margin-left:0}.mtg{display:flex}.pb2{padding:12px}}
 </style>
 </head>
 <body>
-<div id="ls"><div style="width:50px;height:55px;position:relative"><svg viewBox="0 0 40 48" fill="none" width="50" height="55"><path d="M20 2L38 12V28C38 38 20 46 20 46S2 38 2 28V12L20 2Z" fill="rgba(45,139,78,.2)" stroke="#2D8B4E" stroke-width="2"/><path d="M20 14L14 20V28L20 34L26 28V20L20 14Z" fill="#C9A84C" opacity=".8"/></svg><div style="position:absolute;top:50%;left:50%;width:36px;height:36px;border:2.5px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:sp 1s linear infinite;transform:translate(-50%,-50%)"></div></div><div style="margin-top:18px;color:var(--accent);font-size:12px;letter-spacing:4px;text-transform:uppercase">Initializing</div><div style="width:180px;height:2px;background:var(--border);margin-top:12px;border-radius:1px;overflow:hidden"><div style="height:100%;background:var(--accent);animation:lb2 2s ease-in-out forwards"></div></div><style>@keyframes lb2{from{width:0}to{width:100%}}</style></div>
+
+<div id="loginOverlay">
+  <div class="login-box">
+    <div class="login-brand"><div class="lb-icon"><i class="fas fa-shield-halved"></i></div><div><div class="lb-name">SecureVote</div><div class="lb-sub">Electoral Ballot System</div></div></div>
+    <h2>System Login</h2>
+    <div class="sub">Select your role to continue</div>
+    <div class="login-role">
+      <div class="role-btn sel" id="roleAdmin" onclick="window.selRole('admin',this)"><span class="ri" style="color:var(--accent)"><i class="fas fa-user-shield"></i></span><span class="rn">Admin</span><span class="rd">Electoral Commissioner</span></div>
+      <div class="role-btn" id="roleRO" onclick="window.selRole('ro',this)"><span class="ri" style="color:var(--green)"><i class="fas fa-id-badge"></i></span><span class="rn">Returning Officer</span><span class="rd">Polling Station Manager</span></div>
+    </div>
+    <div id="loginFields">
+      <div class="login-field" id="lfUser" style="display:none"><label>Username</label><input class="inf" id="lgUser" placeholder="e.g. ro_okello"></div>
+      <div class="login-field"><label>Password</label><input class="inf" id="lgPass" type="password" placeholder="Enter password" onkeydown="if(event.key==='Enter')window.doLogin()"></div>
+    </div>
+    <div class="login-error" id="lgErr"></div>
+    <button class="bt bt-p wf" onclick="window.doLogin()" id="lgBtn"><i class="fas fa-sign-in-alt"></i>Sign In</button>
+    <div style="text-align:center;margin-top:14px;font-size:10px;color:var(--muted)">Admin password: <strong>IEBC2027</strong> &nbsp;|&nbsp; RO: <strong>ro_okello</strong> / <strong>RO2027</strong></div>
+  </div>
+</div>
+
 <div class="bgp"></div>
 <button class="mtg" onclick="document.querySelector('.sb').classList.toggle('op2')"><i class="fas fa-bars"></i></button>
 <div class="tc" id="tst"></div>
 
 <nav class="sb" id="sbar">
-  <div class="sb-br"><div class="si"><i class="fas fa-shield-halved"></i></div><div><div class="bn">IEBC</div><div class="bs">Kenya 2027</div></div></div>
+  <div class="sb-br"><div class="si"><i class="fas fa-shield-halved"></i></div><div><div class="bn">SecureVote</div><div class="bs" id="sysMode">&mdash;</div></div></div>
   <div class="sb-nv">
-    <div class="ni act" data-view="dashboard" onclick="sv('dashboard',this)"><i class="fas fa-gauge-high"></i>Dashboard</div>
-    <div class="ni" data-view="registration" onclick="sv('registration',this)"><i class="fas fa-user-plus"></i>Register Voter<span class="nb" id="rgBdg" style="display:none">LOCKED</span></div>
-    <div class="ni" data-view="authentication" onclick="sv('authentication',this)"><i class="fas fa-fingerprint"></i>Voter Auth</div>
-    <div class="ni" data-view="ballot-gen" onclick="sv('ballot-gen',this)"><i class="fas fa-file-lines"></i>Ballot Gen</div>
-    <div class="ni" data-view="ballot-cast" onclick="sv('ballot-cast',this)"><i class="fas fa-box-archive"></i>Ballot Cast</div>
-    <div class="ni" data-view="accounting" onclick="sv('accounting',this)"><i class="fas fa-chart-pie"></i>Accounting</div>
-    <div class="ni" data-view="results" onclick="sv('results',this)"><i class="fas fa-square-poll-vertical"></i>Results</div>
-    <div class="ni" data-view="analytics" onclick="sv('analytics',this)"><i class="fas fa-chart-line"></i>Analytics</div>
-    <div class="ni" data-view="admin" onclick="sv('admin',this)"><i class="fas fa-users-gear"></i>Admin</div>
+    <div class="ni act" data-view="dashboard" onclick="window.sv('dashboard',this)"><i class="fas fa-gauge-high"></i>Dashboard</div>
+    <div class="ni admin-only" data-view="admin-cfg" onclick="window.sv('admin-cfg',this)"><i class="fas fa-cog"></i>Admin Config</div>
+    <div class="ni admin-only" data-view="candidates" onclick="window.sv('candidates',this)"><i class="fas fa-users"></i>Candidates</div>
+    <div class="ni admin-only" data-view="officers" onclick="window.sv('officers',this)"><i class="fas fa-id-badge"></i>Officers</div>
+    <div class="ni ro-only" data-view="registration" onclick="window.sv('registration',this)"><i class="fas fa-user-plus"></i>Register Voter</div>
+    <div class="ni ro-only" data-view="authentication" onclick="window.sv('authentication',this)"><i class="fas fa-fingerprint"></i>Voter Auth</div>
+    <div class="ni ro-only" data-view="ballot-gen" onclick="window.sv('ballot-gen',this)"><i class="fas fa-file-lines"></i>Ballot Gen</div>
+    <div class="ni" data-view="ballot-cast" onclick="window.sv('ballot-cast',this)"><i class="fas fa-box-archive"></i>Ballot Cast</div>
+    <div class="ni" data-view="accounting" onclick="window.sv('accounting',this)"><i class="fas fa-chart-pie"></i>Accounting</div>
+    <div class="ni" data-view="results" onclick="window.sv('results',this)"><i class="fas fa-square-poll-vertical"></i>Results</div>
+    <div class="ni" data-view="analytics" onclick="window.sv('analytics',this)"><i class="fas fa-chart-line"></i>Analytics</div>
   </div>
-  <div class="sb-ft"><div class="av"><i class="fas fa-user-shield"></i></div><div><div class="un">RO Okello</div><div class="ur">Returning Officer</div></div></div>
+  <div class="sb-ft"><div class="av"><i class="fas fa-user-shield"></i></div><div><div class="un" id="usrName">&mdash;</div><div class="ur" id="usrRole">&mdash;</div></div></div>
 </nav>
 
 <div class="mc">
   <header class="mh">
-    <div style="display:flex;align-items:center;gap:12px"><div class="lb"><div class="ld"></div>LIVE</div><div class="pt" id="pgT">Dashboard</div><div class="cb ck" id="cnB"><i class="fas fa-circle" style="font-size:5px"></i><span id="cnT">Connecting</span></div></div>
-    <div class="ha"><div style="font-size:10px;color:var(--muted);text-align:right"><div>Station: <span style="color:var(--fg);font-weight:600">NAIROBI-042</span></div><div id="elDt" style="font-size:9px">Election: —</div></div><button class="hb" onclick="rsh()"><i class="fas fa-sync-alt"></i></button><button class="hb"><i class="fas fa-bell"></i><div class="dt"></div></button></div>
+    <div style="display:flex;align-items:center;gap:12px"><div class="lb"><div class="ld"></div>LIVE</div><div class="pt" id="pgT">Dashboard</div><div class="cb ck" id="cnB"><i class="fas fa-circle" style="font-size:5px"></i><span id="cnT">Offline</span></div></div>
+    <div class="ha"><div style="font-size:10px;color:var(--muted);text-align:right"><div id="elDtH">Election: &mdash;</div><div id="elTypeH">Type: &mdash;</div></div><button class="hb" onclick="window.rsh()"><i class="fas fa-sync-alt"></i></button><button class="hb" onclick="window.doLogout()"><i class="fas fa-sign-out-alt"></i></button></div>
   </header>
 
-  <!-- ===== DASHBOARD ===== -->
-  <div class="pb vs" id="view-dashboard">
+  <div class="pb2 vs" id="view-dashboard">
     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-      <div class="sc"><div class="si2" style="background:rgba(45,139,78,.15);color:var(--success)"><i class="fas fa-users"></i></div><div class="sv" id="sR">—</div><div class="sl">Registered</div></div>
-      <div class="sc"><div class="si2" style="background:rgba(201,168,76,.15);color:var(--accent)"><i class="fas fa-user-check"></i></div><div class="sv" id="sV">—</div><div class="sl">Verified</div></div>
-      <div class="sc"><div class="si2" style="background:rgba(61,165,93,.15);color:var(--success)"><i class="fas fa-print"></i></div><div class="sv" id="sP">—</div><div class="sl">Printed</div></div>
-      <div class="sc"><div class="si2" style="background:rgba(201,68,68,.15);color:var(--danger)"><i class="fas fa-box-archive"></i></div><div class="sv" id="sC">—</div><div class="sl">Cast</div></div>
+      <div class="sc"><div style="width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;margin-bottom:8px;background:rgba(45,139,78,.15);color:var(--success)"><i class="fas fa-users"></i></div><div class="sv" id="sR">0</div><div class="sl">Registered</div></div>
+      <div class="sc"><div style="width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;margin-bottom:8px;background:rgba(201,168,76,.15);color:var(--accent)"><i class="fas fa-user-check"></i></div><div class="sv" id="sV">0</div><div class="sl">Verified</div></div>
+      <div class="sc"><div style="width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;margin-bottom:8px;background:rgba(61,165,93,.15);color:var(--success)"><i class="fas fa-print"></i></div><div class="sv" id="sP">0</div><div class="sl">Printed</div></div>
+      <div class="sc"><div style="width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;margin-bottom:8px;background:rgba(201,68,68,.15);color:var(--danger)"><i class="fas fa-box-archive"></i></div><div class="sv" id="sC">0</div><div class="sl">Cast</div></div>
     </div>
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
-      <div class="cd"><div class="ct">Timeline</div><canvas id="ch1" height="160"></canvas></div>
-      <div class="cd"><div class="ct">Status</div><canvas id="ch2" height="160"></canvas></div>
-    </div>
-    <div class="cd"><div class="ct">Live Audit Log</div><div id="dL" style="max-height:160px;overflow-y:auto"></div></div>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4"><div class="cd"><div class="ct">Timeline</div><canvas id="ch1" height="160"></canvas></div><div class="cd"><div class="ct">Status</div><canvas id="ch2" height="160"></canvas></div></div>
+    <div class="cd"><div class="ct">Audit Log</div><div id="dL" style="max-height:160px;overflow-y:auto"></div></div>
   </div>
 
-  <!-- ===== VOTER REGISTRATION ===== -->
-  <div class="pb vs" id="view-registration" style="display:none">
-    <div id="rgCl" class="rbn cl" style="display:none"><i class="fas fa-lock"></i><div><strong>Registration Closed</strong> — Deadline passed. No new voters accepted.</div></div>
-    <div id="rgOp" class="rbn op"><i class="fas fa-unlock"></i><div><strong>Registration Open</strong> — Deadline: <span id="rgDl">5 days after election date</span></div></div>
+  <div class="pb2 vs" id="view-admin-cfg">
+    <h3 style="font-size:16px;font-weight:700;margin-bottom:16px;color:var(--accent)">Admin Configuration</h3>
+    <div class="tg"><button class="tb act" onclick="window.swTb('tET',this)">Election Type & Date</button><button class="tb" onclick="window.swTb('tPW',this)">Password</button></div>
+    <div class="tc2 act" id="tET">
+      <div class="cd mb-4"><div class="ct">Election Type</div><div class="flex gap-3 mb-4"><button class="bt bt-p flex-1" id="etNat" onclick="window.setEType('national')"><i class="fas fa-flag"></i>National</button><button class="bt bt-s flex-1" id="etSch" onclick="window.setEType('school')"><i class="fas fa-school"></i>School</button></div><div id="schLevelSel" style="display:none" class="mb-4"><label style="font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:4px">School Level</label><select class="inf" id="schLevel" onchange="window.setSchLevel()"><option value="primary">Primary</option><option value="junior">Junior</option><option value="senior">Senior</option></select></div></div>
+      <div class="cd mb-4"><div class="ct">Election Date</div><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div><label style="font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:3px">Election Date</label><input type="date" class="inf" id="elDtIn"><button class="bt bt-p wf mt-3" onclick="window.stElDt()"><i class="fas fa-calendar-check"></i>Set Date</button></div><div style="background:var(--bg2);border-radius:8px;padding:14px"><div style="font-size:10px;color:var(--muted);text-transform:uppercase">Current Config</div><div style="font-size:13px;margin-top:6px">Type: <strong id="adEt">&mdash;</strong></div><div style="font-size:13px;margin-top:4px">Date: <strong id="adEd">Not set</strong></div></div></div></div>
+      <div class="cd"><div class="ct">Active Positions</div><div id="posList" class="space-y-2"></div></div>
+    </div>
+    <div class="tc2" id="tPW"><div class="cd"><div class="ct">Admin Password</div><input class="inf" id="nwPw" type="password" placeholder="New password" style="margin-bottom:12px"><button class="bt bt-p wf" onclick="window.chPw()"><i class="fas fa-key"></i>Update Password</button></div></div>
+  </div>
+
+  <div class="pb2 vs" id="view-candidates"><h3 style="font-size:16px;font-weight:700;margin-bottom:16px;color:var(--accent)">Candidate Management</h3><div id="candMgmt"></div></div>
+
+  <div class="pb2 vs" id="view-officers">
+    <h3 style="font-size:16px;font-weight:700;margin-bottom:16px;color:var(--accent)">Returning Officer Management</h3>
+    <div class="cd mb-4"><div class="ct">Add Officer</div><div class="grid grid-cols-2 gap-3 mb-3"><div><label style="font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:3px">Username</label><input class="inf" id="oUn" placeholder="e.g. ro_njeri"></div><div><label style="font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:3px">Password</label><input class="inf" id="oPw" placeholder="Assign password"></div></div><div class="grid grid-cols-2 gap-3 mb-3"><div><label style="font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:3px">Full Name</label><input class="inf" id="oNm" placeholder="Full name"></div><div><label style="font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:3px">Station</label><input class="inf" id="oSt" value="NAIROBI-042"></div></div><button class="bt bt-g wf" onclick="window.addOff()"><i class="fas fa-user-plus"></i>Add Officer</button></div>
+    <div class="cd"><div class="ct">Officers</div><div id="offList"></div></div>
+  </div>
+
+  <div class="pb2 vs" id="view-registration">
+    <div id="rgOp" class="rbn op"><i class="fas fa-unlock"></i><div><strong>Registration Open</strong></div></div>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div class="ap"><h3 style="font-size:15px;font-weight:700;margin-bottom:16px">Register Voter</h3><div class="space-y-3">
+        <div class="grid grid-cols-2 gap-3"><div><label style="font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:3px" id="idLabel">National ID</label><input class="inf" id="rId" placeholder="e.g. 44567890" maxlength="8"></div><div><label style="font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:3px">Full Name</label><input class="inf" id="rNm" placeholder="SURNAME First"></div></div>
+        <div class="grid grid-cols-2 gap-3" id="natFields"><div><label style="font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:3px">County</label><input class="inf" id="rCo" value="Nairobi City"></div><div><label style="font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:3px">Constituency</label><input class="inf" id="rCn" value="Westlands"></div></div>
+        <div class="grid grid-cols-2 gap-3" id="schFields" style="display:none"><div><label style="font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:3px">School</label><input class="inf" id="rSch" placeholder="School name"></div><div><label style="font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:3px">Class</label><input class="inf" id="rCls" placeholder="e.g. Form 4A"></div></div>
+        <div class="grid grid-cols-2 gap-3"><div><label style="font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:3px">Ward</label><input class="inf" id="rWd" value="Westlands"></div><div><label style="font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:3px">Station</label><input class="inf" id="rSt" value="NAIROBI-042"></div></div>
+        <div><label style="font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:6px">Photo</label><div style="display:flex;gap:12px;align-items:flex-start"><div class="cmb" id="rCamBox" style="max-width:160px;aspect-ratio:1/1"><video id="rVid" autoplay playsinline muted></video><div class="cov"><div class="cr" id="rRing"></div></div></div><div style="flex:1"><canvas id="rPc" style="display:none"></canvas><img id="rPh" class="pt2" style="display:none" alt="Photo"><div id="rPst" style="font-size:10px;color:var(--muted);margin-bottom:8px">No photo</div><button class="bt bt-p wf mb-2" id="rCamB" onclick="window.stRgCam()"><i class="fas fa-camera"></i>Open Camera</button><button class="bt bt-g wf mb-2" id="rSnpB" onclick="window.cpRgPh()" style="display:none"><i class="fas fa-camera-retro"></i>Capture</button><button class="bt bt-s wf" id="rRetB" onclick="window.rtRgPh()" style="display:none"><i class="fas fa-redo"></i>Retake</button></div></div></div>
+        <button class="bt bt-p wf" id="rSubB" onclick="window.subReg()" disabled><i class="fas fa-user-plus"></i>Register</button></div></div>
+      <div class="space-y-4"><div class="cd"><div class="ct">Registered</div><div id="rRg" style="max-height:400px;overflow-y:auto">No entries</div></div></div>
+    </div>
+  </div>
+
+  <div class="pb2 vs" id="view-authentication">
+    <div class="prs mb-4"><div class="ps act" id="ps1"><div class="sd">1</div>ID</div><div class="pl2" id="pl1"></div><div class="ps" id="ps2"><div class="sd">2</div>Fingerprint</div><div class="pl2" id="pl2"></div><div class="ps" id="ps3"><div class="sd">3</div>Face</div><div class="pl2" id="pl3"></div><div class="ps" id="ps4"><div class="sd">4</div>Done</div></div>
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
       <div class="ap">
-        <h3 style="font-size:15px;font-weight:700;margin-bottom:3px">Register New Voter</h3>
-        <p style="font-size:11px;color:var(--muted);margin-bottom:16px">Enter details and capture facial photo for authentication on election day.</p>
-        <div class="space-y-3">
-          <div class="grid grid-cols-2 gap-3">
-            <div><label style="font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:3px">National ID</label><input class="inf" id="rId" placeholder="e.g. 44567890" maxlength="8"></div>
-            <div><label style="font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:3px">Full Name</label><input class="inf" id="rNm" placeholder="SURNAME First"></div>
-          </div>
-          <div class="grid grid-cols-2 gap-3">
-            <div><label style="font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:3px">County</label><input class="inf" id="rCo" value="Nairobi City"></div>
-            <div><label style="font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:3px">Constituency</label><input class="inf" id="rCn" value="Westlands"></div>
-          </div>
-          <div class="grid grid-cols-2 gap-3">
-            <div><label style="font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:3px">Ward</label><input class="inf" id="rWd" value="Westlands"></div>
-            <div><label style="font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:3px">Station Code</label><input class="inf" id="rSt" value="NAIROBI-042"></div>
-          </div>
-          <div>
-            <label style="font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:6px">Voter Photo (Required for Facial Auth)</label>
-            <div style="display:flex;gap:12px;align-items:flex-start">
-              <div class="cmb" id="rCamBox" style="max-width:160px"><video id="rVid" autoplay playsinline muted></video><div class="cov"><div class="cr" id="rRing"></div></div></div>
-              <div style="flex:1">
-                <canvas id="rPc" style="display:none"></canvas>
-                <img id="rPh" class="pt2" style="display:none" alt="Photo">
-                <div id="rPst" style="font-size:10px;color:var(--muted);margin-bottom:8px">No photo captured</div>
-                <button class="bt bt-p wf mb-2" id="rCamB" onclick="stRgCam()"><i class="fas fa-camera"></i>Open Camera</button>
-                <button class="bt bt-g wf mb-2" id="rSnpB" onclick="cpRgPh()" style="display:none"><i class="fas fa-camera-retro"></i>Capture Photo</button>
-                <button class="bt bt-s wf" id="rRetB" onclick="rtRgPh()" style="display:none"><i class="fas fa-redo"></i>Retake</button>
-              </div>
-            </div>
-          </div>
-          <button class="bt bt-p wf" id="rSubB" onclick="subReg()" disabled><i class="fas fa-user-plus"></i>Register Voter</button>
-        </div>
+        <div class="asp act" id="as1"><h3 style="font-size:15px;font-weight:700;margin-bottom:16px">Identification</h3><input class="inf" id="nId" placeholder="ID number" maxlength="8" style="margin-bottom:12px" onkeydown="if(event.key==='Enter')window.vfyId()"><button class="bt bt-p wf" onclick="window.vfyId()"><i class="fas fa-search"></i>Verify</button></div>
+        <div class="asp" id="as2"><h3 style="font-size:15px;font-weight:700;margin-bottom:3px">Fingerprint</h3><div class="fps"><canvas id="fpC" width="170" height="190"></canvas><div class="sl2" id="scLn"></div></div><div class="ss2" id="fpSt" style="color:var(--muted)">Awaiting</div><button class="bt bt-p wf mt-3" id="fpB" onclick="window.stFp()"><i class="fas fa-fingerprint"></i>Authenticate</button><button class="bt bt-s wf mt-2" id="fpFb" style="display:none" onclick="window.fbFp()"><i class="fas fa-hand-pointer"></i>Manual Confirm</button></div>
+        <div class="asp" id="as3"><h3 style="font-size:15px;font-weight:700;margin-bottom:3px">Facial Recognition</h3><div class="pco" id="phCmp" style="display:none"><div><div class="cmb" style="max-width:130px;aspect-ratio:1/1"><video id="fcVid" autoplay playsinline muted style="transform:scaleX(-1)"></video><div class="cov"><div class="cr" id="fcRing"></div></div></div><div style="font-size:9px;color:var(--muted);text-align:center;margin-top:4px">Live</div></div><div style="font-size:20px;color:var(--success)"><i class="fas fa-arrows-left-right"></i></div><div><img id="rgPh2" style="width:130px;height:130px;border-radius:10px;border:2px solid var(--border);object-fit:cover" src="" alt="Reg"><div style="font-size:9px;color:var(--muted);text-align:center;margin-top:4px">Registered</div></div></div><div class="ss2" id="fcSt" style="color:var(--muted)">Ready</div><div class="flex gap-2 mt-3"><button class="bt bt-s flex-1" onclick="window.skFc()">Skip</button><button class="bt bt-p flex-1" id="fcB" onclick="window.stFc()"><i class="fas fa-camera"></i>Scan</button></div></div>
+        <div class="asp" id="as4"><div style="text-align:center;padding:14px 0"><div style="width:64px;height:64px;background:rgba(61,165,93,.15);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:28px;color:var(--success)"><i class="fas fa-check-circle"></i></div><h3 style="font-size:16px;font-weight:700">Authenticated</h3><p style="font-size:11px;color:var(--muted);margin-bottom:14px">Status: <span style="color:var(--accent);font-weight:700">BALLOT ISSUED</span></p><button class="bt bt-p wf" onclick="window.gtBg()"><i class="fas fa-file-lines"></i>Generate Ballot</button></div></div>
       </div>
-      <div class="space-y-4">
-        <div class="cd"><div class="ct">Recently Registered</div><div id="rRg" style="max-height:300px;overflow-y:auto;font-size:11px">No voters yet</div></div>
-        <div class="cd"><div class="ct">Registration Rules</div>
-          <ul style="font-size:10px;color:var(--muted);line-height:1.6;padding-left:14px">
-            <li>Returning Officer registers voters</li>
-            <li>Live facial photo is mandatory</li>
-            <li>Duplicate National IDs are blocked</li>
-            <li>Registration closes 5 days after election date</li>
-            <li>Photo used for facial authentication on election day</li>
-          </ul>
-        </div>
-      </div>
+      <div class="space-y-4"><div class="cd"><div class="ct">Session</div><div id="sInf" style="font-size:11px;color:var(--muted)">No session.</div></div></div>
     </div>
   </div>
 
-  <!-- ===== VOTER AUTH ===== -->
-  <div class="pb vs" id="view-authentication" style="display:none">
-    <div class="prs mb-4">
-      <div class="ps act" id="ps1"><div class="sd">1</div>ID</div><div class="pl" id="pl1"></div>
-      <div class="ps" id="ps2"><div class="sd">2</div>Fingerprint</div><div class="pl" id="pl2"></div>
-      <div class="ps" id="ps3"><div class="sd">3</div>Face Match</div><div class="pl" id="pl3"></div>
-      <div class="ps" id="ps4"><div class="sd">4</div>Done</div>
-    </div>
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-      <div class="ap">
-        <div class="asp act" id="as1"><h3 style="font-size:15px;font-weight:700;margin-bottom:3px">National ID</h3><p style="font-size:11px;color:var(--muted);margin-bottom:16px">Enter voter's ID number.</p><input class="inf" id="nId" placeholder="e.g. 29581734" maxlength="8" style="margin-bottom:12px"><button class="bt bt-p wf" onclick="vfyId()" id="vfyB"><i class="fas fa-search"></i>Verify</button></div>
-        <div class="asp" id="as2"><h3 style="font-size:15px;font-weight:700;margin-bottom:3px">Fingerprint</h3><p style="font-size:11px;color:var(--muted);margin-bottom:12px">WebAuthn device biometric.</p><div class="fps"><canvas id="fpC" width="170" height="190"></canvas><div class="sl2" id="scLn"></div></div><div class="ss2" id="fpSt" style="color:var(--muted)">Awaiting...</div><div id="waSt" style="text-align:center;margin-top:5px;font-size:9px;color:var(--muted)"></div><button class="bt bt-p wf mt-3" id="fpB" onclick="stFp()"><i class="fas fa-fingerprint"></i>Authenticate</button><button class="bt bt-s wf mt-2" id="fpFb" style="display:none" onclick="fbFp()"><i class="fas fa-hand-pointer"></i>Manual Confirm</button></div>
-        <div class="asp" id="as3">
-          <h3 style="font-size:15px;font-weight:700;margin-bottom:3px">Facial Recognition</h3>
-          <p style="font-size:11px;color:var(--muted);margin-bottom:12px">Live camera compared against registered photo.</p>
-          <div class="pco" id="phCmp" style="display:none">
-            <div><div class="cmb" style="max-width:130px;aspect-ratio:1/1"><video id="fcVid" autoplay playsinline muted style="transform:scaleX(-1)"></video><div class="cov"><div class="cr" id="fcRing"></div></div></div><div class="pl2">Live Camera</div></div>
-            <div class="mi"><i class="fas fa-arrows-left-right"></i></div>
-            <div><img id="rgPh2" class="pt2" style="width:130px;height:130px;border-radius:10px" src="" alt="Registered"><div class="pl2">Registered Photo</div></div>
-          </div>
-          <div id="fcCnf" style="text-align:center;margin-top:6px;font-size:10px;color:var(--muted)"></div>
-          <div class="ss2" id="fcSt" style="color:var(--muted)">Ready</div>
-          <div class="flex gap-2 mt-3"><button class="bt bt-s flex-1" onclick="skFc()"><i class="fas fa-forward"></i>Skip</button><button class="bt bt-p flex-1" id="fcB" onclick="stFc()"><i class="fas fa-camera"></i>Start Scan</button></div>
-        </div>
-        <div class="asp" id="as4"><div style="text-align:center;padding:14px 0"><div style="width:64px;height:64px;background:rgba(61,165,93,.15);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:28px;color:var(--success)"><i class="fas fa-check-circle"></i></div><h3 style="font-size:16px;font-weight:700">Authenticated</h3><p style="font-size:11px;color:var(--muted);margin-bottom:14px">Status: <span style="color:var(--accent);font-weight:700">BALLOT ISSUED</span></p><button class="bt bt-p wf" onclick="gtBg()"><i class="fas fa-file-lines"></i>Generate Ballot</button></div></div>
-      </div>
-      <div class="space-y-4"><div class="cd"><div class="ct">Session</div><div id="sInf" style="font-size:11px;color:var(--muted)">No active session.</div></div><div class="cd"><div class="ct">Privacy</div><p style="font-size:10px;color:var(--muted);line-height:1.5">Databases are cryptographically separate. No vote linked to identity.</p></div></div>
-    </div>
-  </div>
-
-  <!-- ===== BALLOT GEN ===== -->
-  <div class="pb vs" id="view-ballot-gen" style="display:none">
+  <div class="pb2 vs" id="view-ballot-gen">
     <div class="grid grid-cols-1 lg:grid-cols-5 gap-4">
-      <div class="lg:col-span-3"><div class="cd" style="padding:18px"><div class="ct">Official Ballot Paper</div>
-        <div class="bp brl" id="bPpr"><div class="bwm">IEBC</div>
-          <div class="bh2"><div class="coa"><i class="fas fa-shield-halved"></i></div><div class="ht"><h2>Republic of Kenya</h2><h1>General Election 2027</h1></div><div class="ib">IEBC</div></div>
-          <div class="bi2"><strong>INSTRUCTIONS:</strong> Mark an <strong>"X"</strong> next to your chosen candidate. Vote for ONLY ONE.</div>
-          <div class="bb"><div class="bt2">Presidential Ballot Paper</div><div id="cLst"></div></div>
-          <div class="bf2"><div class="qa"><canvas id="qrC" width="72" height="72"></canvas></div><div style="flex:1;padding:0 8px;font-size:8px;color:#555">Station: <strong>NAIROBI-042</strong></div><div class="si2"><div style="font-size:8px;color:#333;font-weight:700">ID: <span id="bId">—</span></div><div style="font-size:8px;color:#333;font-weight:700">Serial: <span id="bSr">—</span></div><div class="sh" id="bSg">—</div></div></div>
-        </div>
-      </div></div>
+      <div class="lg:col-span-3"><div class="cd" style="padding:18px"><div class="ct">Official Ballot Papers</div><div id="bPapersContainer" style="max-height:620px;overflow-y:auto;padding-right:4px"><div id="bPapersPlaceholder" style="text-align:center;padding:40px;color:var(--muted);font-size:11px"><i class="fas fa-lock" style="font-size:24px;display:block;margin-bottom:8px"></i>Authenticate voter first, then generate</div></div></div></div>
       <div class="lg:col-span-2 space-y-4">
-        <div class="cd"><div class="ct">Controls</div><div id="bgLk" style="text-align:center;padding:14px 0;color:var(--muted);font-size:11px"><i class="fas fa-lock" style="font-size:24px;display:block;margin-bottom:8px"></i>Complete auth first.</div><div id="bgRd" style="display:none"><button class="bt bt-p wf mb-2" id="gnB" onclick="genBl()"><i class="fas fa-wand-magic-sparkles"></i>Generate</button><button class="bt bt-s wf" id="prB" onclick="prBl()" disabled><i class="fas fa-print"></i>Print</button></div></div>
-        <div class="cd"><div class="ct">Security</div><div class="space-y-1"><div class="sit"><div class="sd2 g"></div><span style="flex:1">PKI RSA-4096</span></div><div class="sit"><div class="sd2 g"></div><span style="flex:1">Watermark</span></div><div class="sit"><div class="sd2 g"></div><span style="flex:1">HSM FIPS 140-2</span></div></div></div>
+        <div class="cd"><div class="ct">Controls</div><div id="bgLk" style="text-align:center;padding:14px 0;color:var(--muted);font-size:11px"><i class="fas fa-lock" style="font-size:24px;display:block;margin-bottom:8px"></i>Authenticate voter first.</div><div id="bgRd" style="display:none"><button class="bt bt-p wf mb-2" id="gnB" onclick="window.genBl()"><i class="fas fa-wand-magic-sparkles"></i>Generate Ballot Papers</button><button class="bt bt-s wf mb-2" id="prB" onclick="window.prBl()" disabled><i class="fas fa-print"></i>Print All</button><button class="bt bt-d wf" id="spB" onclick="window.spBl()" style="display:none"><i class="fas fa-ban"></i>Spoil Set</button></div></div>
+        <div class="cd"><div class="ct">Security</div><div class="space-y-1"><div class="sit"><div class="sd2 g"></div><span style="flex:1">PKI RSA-4096</span></div><div class="sit"><div class="sd2 g"></div><span style="flex:1">Watermark</span></div><div class="sit"><div class="sd2 g"></div><span style="flex:1">QR Signature</span></div></div></div>
+        <div class="cd" id="bGenInfo" style="display:none"><div class="ct">Generated Set</div><div style="font-size:11px;color:var(--muted)" id="bGenDetails"></div></div>
       </div>
     </div>
   </div>
 
-  <!-- ===== BALLOT CAST ===== -->
-  <div class="pb vs" id="view-ballot-cast" style="display:none">
+  <div class="pb2 vs" id="view-ballot-cast">
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-      <div class="ap">
-        <h3 style="font-size:15px;font-weight:700;margin-bottom:3px">Ballot Scanner</h3>
-        <p style="font-size:11px;color:var(--muted);margin-bottom:16px">Scan QR or enter Ballot ID manually.</p>
-        <div class="flex gap-2 mb-4"><button class="bt bt-p flex-1" id="cmB" onclick="stCamSc()"><i class="fas fa-camera"></i>Camera</button><button class="bt bt-s flex-1" id="mnB" onclick="shMan()"><i class="fas fa-keyboard"></i>Manual</button></div>
-        <div id="camAr" style="display:none"><div class="scc"><video id="scVid" autoplay playsinline muted></video><canvas id="scCnv"></canvas><div class="sov"><div class="scn"><span></span></div></div><div class="lsr"></div><div class="qf" id="qf"></div></div><div style="text-align:center;margin-top:10px"><div id="scSt" style="font-size:11px;color:var(--accent)">Initializing...</div><button class="bt bt-d mt-2" onclick="spCamSc()" style="font-size:9px;padding:5px 10px"><i class="fas fa-stop"></i>Stop</button></div></div>
-        <div id="manAr" style="display:none"><input class="inf" id="mBid" placeholder="e.g. BID-042-00001" style="margin-bottom:12px"><button class="bt bt-p wf" onclick="vfyMan()"><i class="fas fa-search"></i>Verify</button></div>
-        <div id="vfyPg" style="display:none;margin-top:16px"><div class="va" id="vAn"><div class="vc"></div><div class="vp"></div><div class="vi"><i class="fas fa-check"></i></div></div><div id="vPg" style="text-align:center;font-size:11px;color:var(--muted);margin-top:8px"></div></div>
-        <div id="scRs" style="display:none;margin-top:16px"></div>
-      </div>
-      <div class="space-y-4">
-        <div class="cd"><div class="ct">Checks</div><div class="space-y-1"><div class="sit" id="ck1"><div class="sd2" style="background:var(--border)"></div><span style="flex:1">QR Authenticity</span><span style="font-size:9px;color:var(--muted)" id="ck1v">Pending</span></div><div class="sit" id="ck2"><div class="sd2" style="background:var(--border)"></div><span style="flex:1">Digital Signature</span><span style="font-size:9px;color:var(--muted)" id="ck2v">Pending</span></div><div class="sit" id="ck3"><div class="sd2" style="background:var(--border)"></div><span style="flex:1">Serial Number</span><span style="font-size:9px;color:var(--muted)" id="ck3v">Pending</span></div><div class="sit" id="ck4"><div class="sd2" style="background:var(--border)"></div><span style="flex:1">Station Match</span><span style="font-size:9px;color:var(--muted)" id="ck4v">Pending</span></div><div class="sit" id="ck5"><div class="sd2" style="background:var(--border)"></div><span style="flex:1">Duplicate Detection</span><span style="font-size:9px;color:var(--muted)" id="ck5v">Pending</span></div></div></div>
-        <div class="cd"><div class="ct">Recent Scans</div><div id="rScn" style="font-size:10px;color:var(--muted)">None yet.</div></div>
-      </div>
+      <div class="ap"><h3 style="font-size:15px;font-weight:700;margin-bottom:16px">Ballot Scanner</h3><div class="flex gap-2 mb-4"><button class="bt bt-p flex-1" onclick="window.stCamSc()"><i class="fas fa-camera"></i>Camera</button><button class="bt bt-s flex-1" onclick="window.shMan()"><i class="fas fa-keyboard"></i>Manual</button></div><div id="camAr" style="display:none"><div class="scc"><video id="scVid" autoplay playsinline muted></video><canvas id="scCnv"></canvas><div class="sov"><div class="scn"><span></span></div></div><div class="lsr"></div></div><div style="text-align:center;margin-top:10px"><button class="bt bt-d mt-2" onclick="window.spCamSc()" style="font-size:9px;padding:5px 10px"><i class="fas fa-stop"></i>Stop</button></div></div><div id="manAr" style="display:none"><input class="inf" id="mBid" placeholder="e.g. BID-042-00001-PRES" style="margin-bottom:12px"><button class="bt bt-p wf" onclick="window.vfyMan()"><i class="fas fa-search"></i>Verify</button></div><div id="vfyPg" style="display:none;margin-top:16px"><div class="va" id="vAn"><div class="vc"></div><div class="vp"></div><div class="vi"><i class="fas fa-check"></i></div></div><div id="vPg" style="text-align:center;font-size:11px;color:var(--muted);margin-top:8px"></div></div></div>
+      <div class="space-y-4"><div class="cd"><div class="ct">Checks</div><div class="space-y-1"><div class="sit" id="ck1"><div class="sd2" style="background:var(--border)"></div><span style="flex:1">QR Authenticity</span><span style="font-size:9px;color:var(--muted)" id="ck1v">Pending</span></div><div class="sit" id="ck2"><div class="sd2" style="background:var(--border)"></div><span style="flex:1">Digital Signature</span><span style="font-size:9px;color:var(--muted)" id="ck2v">Pending</span></div><div class="sit" id="ck3"><div class="sd2" style="background:var(--border)"></div><span style="flex:1">Serial Number</span><span style="font-size:9px;color:var(--muted)" id="ck3v">Pending</span></div><div class="sit" id="ck4"><div class="sd2" style="background:var(--border)"></div><span style="flex:1">Station Match</span><span style="font-size:9px;color:var(--muted)" id="ck4v">Pending</span></div><div class="sit" id="ck5"><div class="sd2" style="background:var(--border)"></div><span style="flex:1">Duplicate</span><span style="font-size:9px;color:var(--muted)" id="ck5v">Pending</span></div></div><div style="margin-top:12px"><button class="bt bt-g wf" id="cstB" onclick="window.cstBl()" disabled><i class="fas fa-check-double"></i>Cast Ballot</button></div></div></div>
     </div>
   </div>
 
-  <!-- ===== ACCOUNTING ===== -->
-  <div class="pb vs" id="view-accounting" style="display:none"><div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4"><div class="sc gg"><div class="sv" id="aR">—</div><div class="sl">Registered</div></div><div class="sc"><div class="sv" style="color:var(--accent)" id="aI">—</div><div class="sl">Issued</div></div><div class="sc"><div class="sv" style="color:var(--success)" id="aC2">—</div><div class="sl">Cast</div></div><div class="sc"><div class="sv" style="color:var(--danger)" id="aSp">—</div><div class="sl">Spoiled</div></div></div></div>
-
-  <!-- ===== RESULTS ===== -->
-  <div class="pb vs" id="view-results" style="display:none"><div style="background:rgba(201,168,76,.08);border:1px solid var(--accent);border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:12px;color:var(--accent)"><i class="fas fa-info-circle"></i> Preliminary results. Paper ballots are legally binding.</div><div class="grid grid-cols-1 lg:grid-cols-2 gap-4"><div class="cd"><div class="ct">Presidential — NAIROBI-042</div><table class="rt"><thead><tr><th>Candidate</th><th>Party</th><th>Votes</th><th>%</th><th style="min-width:70px">Bar</th></tr></thead><tbody id="rsB"></tbody></table></div><div class="cd"><div class="ct">Distribution</div><canvas id="rsCh" height="240"></canvas></div></div></div>
-
-  <!-- ===== ANALYTICS ===== -->
-  <div class="pb vs" id="view-analytics" style="display:none"><div class="cd mb-4"><div class="ct">Live Analytics — Looker Studio</div><div class="lkc"><iframe src="https://datastudio.google.com/embed/reporting/189a1753-8127-4836-93a7-1c40a844b1b9/page/35S4F" frameborder="0" style="border:0" allowfullscreen sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"></iframe></div></div><div class="cd"><div class="ct">Google Sheet</div><div style="text-align:center;padding:12px 0"><a href="https://docs.google.com/spreadsheets/d/1tnBZEbwBqqzJqOwkdsL_qcCZiM9DwLK45BOCVP0iPwA/edit" target="_blank" class="bt bt-p" style="text-decoration:none"><i class="fas fa-table"></i>Open Sheet</a></div></div></div>
-
-  <!-- ===== ADMIN ===== -->
-  <div class="pb vs" id="view-admin" style="display:none">
-    <div class="tg">
-      <button class="tb act" onclick="swTb('tEl',this)">Election Config</button>
-      <button class="tb" onclick="swTb('tSt',this)">Stations</button>
-      <button class="tb" onclick="swTb('tAu',this)">Audit</button>
-    </div>
-    <div class="tc2 act" id="tEl"><div class="cd"><div class="ct">Election Date (Electoral Commissioner Only)</div><p style="font-size:11px;color:var(--muted);margin-bottom:16px">Set the election date. Voter registration closes 5 days after this date.</p><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div><label style="font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:3px">Election Date</label><input type="date" class="inf" id="elDtIn"><button class="bt bt-p wf mt-3" onclick="stElDt()"><i class="fas fa-calendar-check"></i>Set Election Date</button></div><div style="background:var(--bg2);border-radius:8px;padding:14px"><div style="font-size:10px;color:var(--muted);text-transform:uppercase;margin-bottom:4px">Current Config</div><div style="font-size:13px;margin-bottom:6px">Election: <strong id="adEd">Not set</strong></div><div style="font-size:13px;margin-bottom:6px">Reg Deadline: <strong id="adRd">—</strong></div><div style="font-size:13px">Status: <span id="adRs" style="font-weight:700;color:var(--success)">Open</span></div></div></div></div></div>
-    <div class="tc2" id="tSt"><div class="cd"><div class="ct">Stations</div><div id="stTb"></div></div></div>
-    <div class="tc2" id="tAu"><div class="cd"><div class="ct">Audit Log</div><div id="adLg" style="max-height:320px;overflow-y:auto"></div></div></div>
+  <div class="pb2 vs" id="view-accounting">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4"><div class="sc gg"><div class="sv" id="aR2">0</div><div class="sl">Registered</div></div><div class="sc"><div class="sv" style="color:var(--accent)" id="aI2">0</div><div class="sl">Issued</div></div><div class="sc"><div class="sv" style="color:var(--success)" id="aC2">0</div><div class="sl">Cast</div></div><div class="sc"><div class="sv" style="color:var(--danger)" id="aSp2">0</div><div class="sl">Spoiled</div></div></div>
+    <div class="cd"><div class="ct">Reconciliation</div><div id="rcTb"></div></div>
   </div>
+
+  <div class="pb2 vs" id="view-results"><div style="background:rgba(201,168,76,.08);border:1px solid var(--accent);border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:12px;color:var(--accent)"><i class="fas fa-info-circle"></i> Preliminary results.</div><div id="resultsByPosition"></div></div>
+
+  <div class="pb2 vs" id="view-analytics"><div class="cd mb-4"><div class="ct">Analytics</div><div class="lkc"><iframe src="https://datastudio.google.com/embed/reporting/189a1753-8127-4836-93a7-1c40a844b1b9/page/35S4F" frameborder="0" style="border:0" allowfullscreen sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"></iframe></div></div></div>
 </div>
 
-<div class="mo" id="mdl" onclick="if(event.target===this)clMdl()"><div class="mb2" id="mdlB"></div></div>
+<div class="mo" id="mdl" onclick="if(event.target===this)window.clMdl()"><div class="mb2" id="mdlB"></div></div>
 
 <script>
-const AU='https://script.google.com/macros/s/AKfycbw-_hU5mn5p1qjR73Oe-GLE_zHXFOBlI5GtxjW_wkroRlqNzLEJ--jzmak2oICFSHtj/exec';
-const AP={ok:false,async get(a,p={}){try{const u=new URL(AU);u.searchParams.set('action',a);Object.entries(p).forEach(([k,v])=>u.searchParams.set(k,v));const r=await fetch(u.toString());const d=await r.json();this.ok=true;this.bd();return d}catch(e){this.ok=false;this.bd();return null}},async post(a,p={}){try{const r=await fetch(AU,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:a,...p})});const d=await r.json();this.ok=true;this.bd();return d}catch(e){this.ok=false;this.bd();return null}},bd(){const b=document.getElementById('cnB'),t=document.getElementById('cnT');if(b&&t){b.className='cb '+(this.ok?'on':'of');t.textContent=this.ok?'Connected':'Offline'}}};
+(function() {
+  'use strict';
 
-const LD={voters:[{NationalID:'29581734',FullName:'AKINYI Mary',StationCode:'NAIROBI-042',Registered:true,BallotIssued:true,BiometricVerified:true,PhotoData:''},{NationalID:'33012987',FullName:'KAMAU John',StationCode:'NAIROBI-042',Registered:true,BallotIssued:false,BiometricVerified:false,PhotoData:''},{NationalID:'35678901',FullName:'MOHAMED Fatima',StationCode:'NAIROBI-042',Registered:true,BallotIssued:false,BiometricVerified:false,PhotoData:''}],ballots:[{BallotID:'BID-042-00001',SerialNumber:'SN-482901',StationCode:'NAIROBI-042',Status:'Cast',DigitalSignature:'a3f8c2d7e1b9f4a6c3'},{BallotID:'BID-042-00002',SerialNumber:'SN-482902',StationCode:'NAIROBI-042',Status:'Issued',DigitalSignature:'b7d1e9f4a2c8d5b3e7'}],results:[{Candidate:'John K. MWANGI',Party:'UHAI',Votes:198,Color:'#E8A830'},{Candidate:'Mary A. ODHIAMBO',Party:'MUUNGANO',Votes:156,Color:'#3DA55D'},{Candidate:'Abdullah H. ALI',Party:'TAIFA BORA',Votes:89,Color:'#4A90D9'},{Candidate:'Peter O. KAMAU',Party:'MAENDELEO',Votes:72,Color:'#C94444'},{Candidate:'NOTA',Party:'None',Votes:0,Color:'#888888'}],audit:[{Timestamp:'2027-08-09T08:00:01',Type:'auth',Message:'System startup',User:'SYSTEM'}],stations:[{StationCode:'NAIROBI-042',Name:'Westlands Primary',Status:'Open',Registered:782,Alerts:0}],elCfg:{date:null,regOpen:true}};
-const cands=[{num:1,name:'John K. MWANGI',party:'UHAI',full:'UHAI Party',sym:'☀',clr:'#E8A830'},{num:2,name:'Mary A. ODHIAMBO',party:'MUUNGANO',full:'MUUNGANO Party',sym:'🤝',clr:'#3DA55D'},{num:3,name:'Abdullah H. ALI',party:'TAIFA BORA',full:'TAIFA BORA Party',sym:'⭐',clr:'#4A90D9'},{num:4,name:'Peter O. KAMAU',party:'MAENDELEO',full:'MAENDELEO Party',sym:'🏗',clr:'#C94444'},{num:5,name:'NOTA',party:'None',full:'None of the Above',sym:'✕',clr:'#888'}];
+  console.log('SecureVote script loaded');
 
-let aSt=1,cVtr=null,bGen=false,bPrn=false,cBID=null,waOk=false;
-let rgStr=null,fcStr=null,scStr=null,rgPhDt=null,fcDet=null,fcRf=null,scRf=null;
+  // ===== CONFIGURATION =====
+  // UPDATED: Your deployed Apps Script URL
+  const API_URL = 'https://script.google.com/macros/s/AKfycbw-_hU5mn5p1qjR73Oe-GLE_zHXFOBlI5GtxjW_wkroRlqNzLEJ--jzmak2oICFSHtj/exec';
+  
+  // ===== LOCAL STORAGE CREDENTIALS (Fallback if API fails) =====
+  var LOCAL_CREDS = [
+    { username: 'admin', password: 'IEBC2027', role: 'admin', fullName: 'Electoral Commissioner', stationCode: 'NAIROBI-042' },
+    { username: 'ro_okello', password: 'RO2027', role: 'ro', fullName: 'Okello James', stationCode: 'NAIROBI-042' },
+    { username: 'ro_njeri', password: 'RO2027', role: 'ro', fullName: 'Njeri Wangari', stationCode: 'NAIROBI-042' }
+  ];
 
-document.addEventListener('DOMContentLoaded',()=>{setTimeout(()=>document.getElementById('ls').classList.add('h'),2200);setTimeout(()=>{rndC();gQR();ckWA();ldAll();setInterval(()=>aaA(),12000)},300)});
+  // ===== STATE =====
+  var role = 'admin', usr = '', fullName = '', stCode = 'NAIROBI-042', loggedIn = false;
+  var elType = 'national', schLevel = 'senior';
+  var LD = { voters: [], ballots: [], positions: ['President','Governor','Senator','MP','MCA'], candidates: {}, results: [], audit: [], officers: [], elCfg: { type: elType, date: null, regOpen: true, deadline: null } };
+  var aSt = 1, cVtr = null, bGen = false, bPrn = false, cBIDs = [], selCand = {};
+  var rgStr = null, fcStr = null, scStr = null, rgPhDt = null;
+  var chart1 = null, chart2 = null;
+  var baseSerial = '', positionBallots = {}, scanInt = null;
+  var posAbbrMap = { President: 'PRES', Governor: 'GOV', Senator: 'SEN', MP: 'MP', MCA: 'MCA' };
 
-async function ldAll(){await Promise.all([ldSt(),ldRs(),ldAu(),ldBl(),ldEl()]);iCh();rndAdm()}
-async function ldSt(){const r=await AP.get('getStats');if(r&&r.registered!==undefined){uSt(r);return}const v=LD.voters,rg=v.filter(x=>x.Registered).length,is=v.filter(x=>x.BallotIssued).length;uSt({registered:rg,verified:v.filter(x=>x.BiometricVerified).length,printed:LD.ballots.length,cast:LD.ballots.filter(b=>b.Status==='Cast').length,spoiled:0,remaining:rg-is,turnout:rg>0?((is/rg)*100).toFixed(1):'0'})}
-function uSt(s){document.getElementById('sR').textContent=s.registered;document.getElementById('sV').textContent=s.verified||0;document.getElementById('sP').textContent=s.printed||0;document.getElementById('sC').textContent=s.cast||0;document.getElementById('aR').textContent=s.registered;document.getElementById('aI').textContent=s.printed||0;document.getElementById('aC2').textContent=s.cast||0;document.getElementById('aSp').textContent=s.spoiled||0}
-async function ldRs(){const r=await AP.get('getResults');let rs=LD.results;if(r&&r.results)rs=r.results;rndRs(rs)}
-async function ldAu(){const r=await AP.get('getAuditLog',{limit:30});if(r&&r.entries)LD.audit=r.entries.map(e=>({Timestamp:e.Timestamp,Type:e.Type,Message:e.Message,User:e.User||''}));rndAu()}
-async function ldBl(){const r=await AP.get('getBallots');if(r&&r.ballots)LD.ballots=r.ballots}
+  var defaultCandidates = {
+    President: [ { name: 'ODINGA Raila', party: 'ODM', symbol: 'A', letter: 'A' }, { name: 'RUTO William', party: 'UDA', symbol: 'B', letter: 'B' }, { name: 'WETANGULA Moses', party: 'FORD-K', symbol: 'C', letter: 'C' }, { name: 'KALONZO Musyoka', party: 'Wiper', symbol: 'D', letter: 'D' } ],
+    Governor: [ { name: 'JOHNSON Sakaja', party: 'UDA', symbol: 'A', letter: 'A' }, { name: 'POLACK Kenneth', party: 'ODM', symbol: 'B', letter: 'B' } ],
+    Senator: [ { name: 'CHERARGEY Edwin', party: 'UDA', symbol: 'A', letter: 'A' }, { name: 'ODINGA Jr', party: 'ODM', symbol: 'B', letter: 'B' } ],
+    MP: [ { name: 'WETANGULA Timothy', party: 'FORD-K', symbol: 'A', letter: 'A' }, { name: 'MURKOMEN Kipchumba', party: 'UDA', symbol: 'B', letter: 'B' } ],
+    MCA: [ { name: 'KAURA James', party: 'ODM', symbol: 'A', letter: 'A' }, { name: 'WAMBUA Peter', party: 'Wiper', symbol: 'B', letter: 'B' } ]
+  };
+  LD.candidates = JSON.parse(JSON.stringify(defaultCandidates));
 
-// Election Config
-async function ldEl(){const r=await AP.get('getElectionDate');if(r&&r.date){LD.elCfg={date:r.date,electionDate:r.electionDate,deadline:r.deadline,regOpen:r.registrationOpen}}uElUI()}
-function uElUI(){const c=LD.elCfg;const dd=document.getElementById('elDt'),rb=document.getElementById('rgBdg'),rc=document.getElementById('rgCl'),ro=document.getElementById('rgOp'),ae=document.getElementById('adEd'),ar=document.getElementById('adRd'),as=document.getElementById('adRs'),rd=document.getElementById('rgDl');
-if(c.date){const d=new Date(c.electionDate||c.date),dl=c.deadline?new Date(c.deadline):new Date(d.getTime()+5*86400000);
-dd.textContent='Election: '+d.toLocaleDateString();if(ae)ae.textContent=d.toLocaleDateString();if(ar)ar.textContent=dl.toLocaleDateString();if(rd)rd.textContent=dl.toLocaleDateString();
-if(c.regOpen){if(rb)rb.style.display='none';if(rc)rc.style.display='none';if(ro)ro.style.display='flex';if(as){as.textContent='Open';as.style.color='var(--success)'}document.getElementById('rSubB').disabled=!rgPhDt}else{if(rb)rb.style.display='inline';if(rc)rc.style.display='flex';if(ro)ro.style.display='none';if(as){as.textContent='Closed';as.style.color='var(--danger)'}document.getElementById('rSubB').disabled=true}
-if(ae)document.getElementById('elDtIn').value=c.date.substring(0,10)}else{dd.textContent='Election: Not set'}}
-async function stElDt(){const d=document.getElementById('elDtIn').value;if(!d){tst('error','Select a date');return}tst('info','Setting...');await AP.post('setElectionDate',{date:d});await ldEl();tst('success','Election date set');aA('info','Election date set to '+d+' by Electoral Commissioner')}
+  // ===== API HELPER =====
+  function apiCall(action, data, method) {
+    return new Promise(function(resolve, reject) {
+      method = method || 'GET';
+      var url = API_URL + '?action=' + encodeURIComponent(action);
+      if (method === 'GET') {
+        if (data) {
+          Object.keys(data).forEach(function(key) {
+            url += '&' + encodeURIComponent(key) + '=' + encodeURIComponent(data[key]);
+          });
+        }
+        fetch(url)
+          .then(function(response) { 
+            if (!response.ok) throw new Error('HTTP ' + response.status);
+            return response.json(); 
+          })
+          .then(function(result) { resolve(result); })
+          .catch(function(err) { reject(err); });
+      } else {
+        fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        })
+          .then(function(response) { 
+            if (!response.ok) throw new Error('HTTP ' + response.status);
+            return response.json(); 
+          })
+          .then(function(result) { resolve(result); })
+          .catch(function(err) { reject(err); });
+      }
+    });
+  }
 
-// Registration
-async function stRgCam(){const v=document.getElementById('rVid');document.getElementById('rCamB').style.display='none';document.getElementById('rSnpB').style.display='block';try{rgStr=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:320},height:{ideal:320}}});v.srcObject=rgStr;await v.play()}catch(e){tst('error','Camera unavailable');document.getElementById('rCamB').style.display='block';document.getElementById('rSnpB').style.display='none'}}
-function cpRgPh(){const v=document.getElementById('rVid'),c=document.getElementById('rPc'),p=document.getElementById('rPh');c.width=120;c.height=120;const x=c.getContext('2d');x.translate(c.width,0);x.scale(-1,1);x.drawImage(v,0,0,c.width,c.height);rgPhDt=c.toDataURL('image/jpeg',0.5);p.src=rgPhDt;p.style.display='block';if(rgStr){rgStr.getTracks().forEach(t=>t.stop());rgStr=null}document.getElementById('rCamB').style.display='none';document.getElementById('rSnpB').style.display='none';document.getElementById('rRetB').style.display='block';document.getElementById('rPst').innerHTML='<span style="color:var(--success)"><i class="fas fa-check-circle"></i> Photo captured</span>';document.getElementById('rSubB').disabled=false}
-function rtRgPh(){rgPhDt=null;document.getElementById('rPh').style.display='none';document.getElementById('rPst').textContent='No photo';document.getElementById('rCamB').style.display='block';document.getElementById('rRetB').style.display='none';document.getElementById('rSubB').disabled=true}
-async function subReg(){if(!LD.elCfg.regOpen&&LD.elCfg.date){tst('error','Registration closed');return}const id=document.getElementById('rId').value.trim(),nm=document.getElementById('rNm').value.trim();if(!id||!nm){tst('error','ID and Name required');return}if(!rgPhDt){tst('error','Photo required');return}tst('info','Registering...');const r=await AP.post('registerVoter',{nationalId:id,fullName:nm,county:document.getElementById('rCo').value,constituency:document.getElementById('rCn').value,ward:document.getElementById('rWd').value,stationCode:document.getElementById('rSt').value,photoData:rgPhDt,registeredBy:'RO Okello'});if(r&&r.success){LD.voters.push({NationalID:id,FullName:nm,StationCode:document.getElementById('rSt').value,Registered:true,BallotIssued:false,BiometricVerified:false,PhotoData:rgPhDt});tst('success','Registered: '+nm);aA('auth','New voter: '+id+' — '+nm);document.getElementById('rId').value='';document.getElementById('rNm').value='';rtRgPh();ldSt()}else{tst('error',r?.message||'Failed')}rndRgR()}
-function rndRgR(){document.getElementById('rRg').innerHTML=LD.voters.slice(-10).reverse().map(v=>'<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border)">'+(v.PhotoData?'<img src="'+v.PhotoData+'" style="width:28px;height:28px;border-radius:50%;object-fit:cover;background:var(--border)">':'<div style="width:28px;height:28px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--muted)"><i class="fas fa-user"></i></div>')+'<div><div style="font-weight:600">'+v.FullName+'</div><div style="font-size:9px;color:var(--muted)">'+v.NationalID+' — '+v.StationCode+'</div></div></div>').join('')||'No voters yet'}
+  // ===== TOAST NOTIFICATION =====
+  function tst(tp, msg) {
+    var c = document.getElementById('tst'), t = document.createElement('div');
+    t.className = 'tt ' + tp;
+    var ic = { success: 'fa-check-circle', error: 'fa-times-circle', warning: 'fa-exclamation-triangle', info: 'fa-info-circle' };
+    t.innerHTML = '<i class="fas ' + (ic[tp] || 'fa-info-circle') + '"></i> ' + msg;
+    c.appendChild(t);
+    setTimeout(function() {
+      t.style.opacity = '0';
+      t.style.transition = 'opacity .3s';
+      setTimeout(function() { t.remove(); }, 300);
+    }, 4000);
+  }
 
-// WebAuthn
-async function ckWA(){if(!window.PublicKeyCredential){document.getElementById('fpFb').style.display='block';return}try{const a=await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();if(a){waOk=true;document.getElementById('waSt').innerHTML='<span style="color:var(--success)"><i class="fas fa-fingerprint"></i> Sensor ready</span>'}else{document.getElementById('fpFb').style.display='block'}}catch(e){document.getElementById('fpFb').style.display='block'}}
-async function stFp(){const b=document.getElementById('fpB'),s=document.getElementById('fpSt'),l=document.getElementById('scLn');b.disabled=true;l.style.display='block';s.style.color='var(--accent)';s.textContent='Scanning...';dFP();if(waOk){try{const ch=new Uint8Array(32);crypto.getRandomValues(ch);const u=new TextEncoder().encode(cVtr?cVtr.NationalID:'v');await navigator.credentials.create({publicKey:{challenge:ch,rp:{name:"IEBC",id:window.location.hostname},user:{id:u,name:"v",displayName:"V"},pubKeyCredParams:[{alg:-7,type:"public-key"},{alg:-257,type:"public-key"}],authenticatorSelection:{authenticatorAttachment:"platform",userVerification:"required"},timeout:60000}});l.style.display='none';s.style.color='var(--success)';s.innerHTML='<i class="fas fa-check-circle"></i> WebAuthn verified';tst('success','Fingerprint passed');aA('auth','FP WebAuthn: '+cVtr?.NationalID);mkVr();setTimeout(()=>aS(3),600);return}catch(e){l.style.display='none';if(e.name==='NotAllowedError'){s.style.color='var(--warn)';s.innerHTML='Cancelled';b.disabled=false;document.getElementById('fpFb').style.display='block';return}}}setTimeout(()=>{document.getElementById('scLn').style.display='none';document.getElementById('fpSt').style.color='var(--success)';document.getElementById('fpSt').innerHTML='<i class="fas fa-check-circle"></i> 98.7%';tst('success','Fingerprint passed');aA('auth','FP: '+cVtr?.NationalID);mkVr();setTimeout(()=>aS(3),600)},2500)}
-async function fbFp(){document.getElementById('fpSt').textContent='Manual...';document.getElementById('scLn').style.display='block';dFP();setTimeout(()=>{document.getElementById('scLn').style.display='none';document.getElementById('fpSt').innerHTML='<i class="fas fa-check-circle"></i> OK';tst('info','Manual confirm');aA('auth','FP manual: '+cVtr?.NationalID);mkVr();setTimeout(()=>aS(3),600)},1500)}
-async function mkVr(){if(cVtr){const lv=LD.voters.find(v=>String(v.NationalID)===String(cVtr.NationalID));if(lv){lv.BallotIssued=true;lv.BiometricVerified=true}await AP.post('verifyVoter',{nationalId:cVtr.NationalID,biometricConfidence:'98%',user:'RO Okello'})}}
-function dFP(){const c=document.getElementById('fpC'),x=c.getContext('2d');x.clearRect(0,0,170,190);x.strokeStyle='#2D8B4E';x.lineWidth=1;x.globalAlpha=.6;for(let i=0;i<13;i++){x.beginPath();x.ellipse(85,95,Math.max(1,7+i*5.2),Math.max(1,9+i*5.8),0,0,Math.PI*2);x.stroke()}x.globalAlpha=.3;for(let i=0;i<8;i++){x.beginPath();const px=85+(Math.random()-.5)*60,py=95+(Math.random()-.5)*80;x.moveTo(px,py);x.lineTo(px+(Math.random()-.5)*16,py+(Math.random()-.5)*16);x.stroke()}}
+  // ===== LOGIN =====
+  function selRole(r, el) {
+    document.querySelectorAll('.role-btn').forEach(function(b) { b.classList.remove('sel'); });
+    if (el) el.classList.add('sel');
+    role = r;
+    document.getElementById('lgUser').value = '';
+    document.getElementById('lgPass').value = '';
+    document.getElementById('lfUser').style.display = r === 'ro' ? 'block' : 'none';
+    var eb = document.getElementById('lgErr');
+    eb.style.display = 'none';
+    eb.innerHTML = '';
+    if (r === 'ro') document.getElementById('lgUser').focus();
+    else document.getElementById('lgPass').focus();
+  }
 
-// Face Auth
-async function stFc(){const b=document.getElementById('fcB');b.disabled=true;const v=document.getElementById('fcVid'),s=document.getElementById('fcSt'),r=document.getElementById('fcRing'),cmp=document.getElementById('phCmp'),img=document.getElementById('rgPh2');
-if(cVtr&&cVtr.PhotoData){img.src=cVtr.PhotoData}else{img.src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="130" height="130"><rect fill="%230B1A0F" width="130" height="130"/><text x="65" y="70" text-anchor="middle" fill="%237A8B7E" font-size="11">No photo</text></svg>'}
-cmp.style.display='flex';s.style.color='var(--accent)';s.textContent='Starting camera...';
-try{fcStr=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:320},height:{ideal:320}}});v.srcObject=fcStr;await v.play();s.textContent='Detecting face...';
-let nd=false;if('FaceDetector' in window){try{fcDet=new FaceDetector({fastMode:true,maxDetectedFaces:1});nd=true}catch(e){}}
-let ct=0;
-async function dFr(){if(!fcStr)return;try{if(nd&&fcDet){const f=await fcDet.detect(v);if(f.length>0){ct++;r.classList.add('det');s.style.color='var(--success)';s.textContent='Face detected — '+ct+'/3';document.getElementById('fcCnf').innerHTML='<span style="color:var(--success)">Confidence: '+(85+ct*4)+'%</span>';if(ct>=3){spFc();s.innerHTML='<i class="fas fa-check-circle"></i> Face matched';tst('success','Face verified');aA('auth','Face verified: '+cVtr?.NationalID);setTimeout(()=>aS(4),600);return}}else{r.classList.remove('det');s.textContent='No face — position within ring'}}else{ct++;s.textContent='Analyzing '+ct+'/5...';if(ct>=5){spFc();s.innerHTML='<i class="fas fa-check-circle"></i> Confirmed';tst('success','Face confirmed');aA('auth','Face confirmed: '+cVtr?.NationalID);setTimeout(()=>aS(4),600);return}}}catch(e){}fcRf=requestAnimationFrame(dFr)}dFr()}catch(e){s.style.color='var(--warn)';s.textContent='Camera: '+e.message;b.disabled=false}}
-function spFc(){if(fcRf)cancelAnimationFrame(fcRf);fcRf=null;if(fcStr){fcStr.getTracks().forEach(t=>t.stop());fcStr=null}}
-function skFc(){spFc();tst('info','Skipped');aS(4)}
+  function doLogin() {
+    try {
+      var pw = document.getElementById('lgPass').value;
+      var un = role === 'admin' ? 'admin' : document.getElementById('lgUser').value.trim();
+      var eb = document.getElementById('lgErr');
+      var btn = document.getElementById('lgBtn');
+      
+      if (!pw) {
+        eb.innerHTML = '<i class="fas fa-exclamation-triangle"></i> <strong>Enter your password</strong><br><span style="font-size:11px">Admin: <strong>IEBC2027</strong> | RO: <strong>RO2027</strong></span>';
+        eb.style.display = 'block';
+        document.getElementById('lgPass').focus();
+        return;
+      }
+      if (role === 'ro' && !un) {
+        eb.innerHTML = '<i class="fas fa-exclamation-triangle"></i> <strong>Enter your RO username</strong><br><span style="font-size:11px">Try: <strong>ro_okello</strong></span>';
+        eb.style.display = 'block';
+        document.getElementById('lgUser').focus();
+        return;
+      }
+      
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking...';
+      eb.style.display = 'none';
 
-// Auth Flow
-async function vfyId(){const id=document.getElementById('nId').value.trim();if(!id){tst('error','Enter ID');return}tst('info','Verifying...');const r=await AP.get('getVoter',{id});let vt=null;if(r&&r.found)vt=r.voter;else vt=LD.voters.find(v=>String(v.NationalID)===String(id));if(!vt){tst('error','Not found');return}if(!vt.Registered){tst('error','Not registered');return}if(vt.BallotIssued){tst('error','DUPLICATE — already issued');aA('error','Dup blocked: '+id);return}cVtr=vt;document.getElementById('sInf').innerHTML='<div style="background:var(--bg2);border-radius:6px;padding:8px;font-size:11px"><div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="color:var(--muted)">ID:</span><span style="font-weight:600">'+vt.NationalID+'</span></div><div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Name:</span><span style="font-weight:600">'+(vt.FullName||'—')+'</span></div></div>';tst('success','Found: '+(vt.FullName||id));aS(2)}
-function aS(s){aSt=s;for(let i=1;i<=4;i++){const e=document.getElementById('ps'+i);e.classList.remove('act','dn');if(i<s)e.classList.add('dn');else if(i===s)e.classList.add('active')}for(let i=1;i<=3;i++)document.getElementById('pl'+i).classList.toggle('dn',i<s);for(let i=1;i<=4;i++)document.getElementById('as'+i).classList.toggle('act',i===s)}
-function gtBg(){sv('ballot-gen',document.querySelector('[data-view="ballot-gen"]'))}
+      // Try API login first
+      apiCall('login', { username: un, password: pw })
+        .then(function(result) {
+          if (result.success) {
+            role = result.role;
+            usr = result.username;
+            fullName = result.fullName;
+            stCode = result.stationCode;
+            localStorage.setItem('svRole', role);
+            localStorage.setItem('svUser', usr);
+            localStorage.setItem('svName', fullName);
+            localStorage.setItem('svSt', stCode);
+            document.getElementById('loginOverlay').classList.add('hidden');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-sign-in-alt"></i>Sign In';
+            showApp();
+            tst('success', 'Welcome, ' + fullName);
+            return;
+          }
+          // Fallback to local credentials
+          var match = null;
+          for (var i = 0; i < LOCAL_CREDS.length; i++) {
+            var c = LOCAL_CREDS[i];
+            if (c.username === un && c.password === pw && c.role === role) {
+              match = c;
+              break;
+            }
+          }
+          if (match) {
+            role = match.role;
+            usr = match.username;
+            fullName = match.fullName;
+            stCode = match.stationCode;
+            localStorage.setItem('svRole', role);
+            localStorage.setItem('svUser', usr);
+            localStorage.setItem('svName', fullName);
+            localStorage.setItem('svSt', stCode);
+            document.getElementById('loginOverlay').classList.add('hidden');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-sign-in-alt"></i>Sign In';
+            showApp();
+            tst('success', 'Welcome, ' + fullName + ' (local)');
+            return;
+          }
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fas fa-sign-in-alt"></i>Sign In';
+          eb.innerHTML = '<i class="fas fa-key"></i> <strong>Invalid credentials</strong><br>Check your username and password.';
+          eb.style.display = 'block';
+        })
+        .catch(function(err) {
+          console.error('Login API error:', err);
+          // Fallback to local credentials
+          var match = null;
+          for (var i = 0; i < LOCAL_CREDS.length; i++) {
+            var c = LOCAL_CREDS[i];
+            if (c.username === un && c.password === pw && c.role === role) {
+              match = c;
+              break;
+            }
+          }
+          if (match) {
+            role = match.role;
+            usr = match.username;
+            fullName = match.fullName;
+            stCode = match.stationCode;
+            localStorage.setItem('svRole', role);
+            localStorage.setItem('svUser', usr);
+            localStorage.setItem('svName', fullName);
+            localStorage.setItem('svSt', stCode);
+            document.getElementById('loginOverlay').classList.add('hidden');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-sign-in-alt"></i>Sign In';
+            showApp();
+            tst('warning', 'Using local login (API unavailable)');
+            return;
+          }
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fas fa-sign-in-alt"></i>Sign In';
+          eb.innerHTML = '<i class="fas fa-wifi"></i> <strong>API unavailable</strong><br>Using local credentials.';
+          eb.style.display = 'block';
+        });
+    } catch (e) {
+      console.error('doLogin error:', e);
+      document.getElementById('lgErr').innerHTML = '<i class="fas fa-bug"></i> Error: ' + e.message;
+      document.getElementById('lgErr').style.display = 'block';
+      document.getElementById('lgBtn').disabled = false;
+      document.getElementById('lgBtn').innerHTML = '<i class="fas fa-sign-in-alt"></i>Sign In';
+    }
+  }
 
-// Ballot Gen
-function rndC(){document.getElementById('cLst').innerHTML=cands.map(c=>'<div class="crw" onclick="mkC('+c.num+',this)"><div class="mb" id="mk'+c.num+'"></div><div class="cn">'+c.num+'</div><div class="ci"><div class="cna">'+c.name+'</div><div class="cpa">'+c.full+'</div></div><div class="ps2">'+c.sym+'</div></div>').join('')}
-function mkC(n){cands.forEach(c=>{const b=document.getElementById('mk'+c.num);if(b)b.textContent=c.num===n?'✕':''})}
-async function genBl(){if(bGen)return;document.getElementById('gnB').disabled=true;const r=await AP.post('issueBallot',{ballotType:'Presidential',stationCode:'NAIROBI-042',user:'RO Okello'});const bid=r?.success?r.ballotId:'BID-042-'+Math.floor(Math.random()*90000+10000);const ser=r?.success?r.serial:'SN-'+Math.floor(Math.random()*900000+100000);const sg=gH();cBID=bid;LD.ballots.push({BallotID:bid,SerialNumber:ser,StationCode:'NAIROBI-042',Status:'Issued',DigitalSignature:sg});document.getElementById('bId').textContent=bid;document.getElementById('bSr').textContent=ser;document.getElementById('bSg').textContent=sg;gQR(bid);bGen=true;document.getElementById('prB').disabled=false;tst('success','Generated: '+bid);aA('info','Ballot '+bid+' generated')}
-async function prBl(){if(!bGen||bPrn)return;bPrn=true;tst('success','Printed');if(cBID)await AP.post('castBallot',{ballotId:cBID,user:'SYSTEM'});document.getElementById('prB').disabled=true;setTimeout(()=>{rsSes();ldAll()},1000)}
-function gH(){const c='0123456789abcdef';let h='';for(let i=0;i<64;i++)h+=c[Math.floor(Math.random()*16)];return h}
-function gQR(d){const cv=document.getElementById('qrC'),x=cv.getContext('2d'),s=72,cs=3;x.clearRect(0,0,s,s);x.fillStyle='#fff';x.fillRect(0,0,s,s);const g=Math.floor(s/cs);function fp(a,b){x.fillStyle='#000';x.fillRect(a,b,7*cs,7*cs);x.fillStyle='#fff';x.fillRect(a+cs,b+cs,5*cs,5*cs);x.fillStyle='#000';x.fillRect(a+2*cs,b+2*cs,3*cs,3*cs)}fp(0,0);fp((g-7)*cs,0);fp(0,(g-7)*cs);x.fillStyle='#000';const sd=(d||'X').split('').reduce((a,c)=>a+c.charCodeAt(0),0);for(let i=0;i<g;i++)for(let j=0;j<g;j++){if(i<8&&j<8)continue;if(i<8&&j>=g-8)continue;if(i>=g-8&&j<8)continue;if(((sd*(i+1)*(j+1))%3)===0)x.fillRect(i*cs,j*cs,cs,cs)}}
-function rsSes(){aSt=1;cVtr=null;bGen=false;bPrn=false;cBID=null;aS(1);document.getElementById('nId').value='';document.getElementById('sInf').innerHTML='<span style="color:var(--muted)">No session.</span>';document.getElementById('bgLk').style.display='block';document.getElementById('bgRd').style.display='none';document.getElementById('gnB').disabled=false;document.getElementById('prB').disabled=true;document.getElementById('fpB').disabled=false;spFc()}
+  function doLogout() {
+    localStorage.removeItem('svRole');
+    localStorage.removeItem('svUser');
+    localStorage.removeItem('svName');
+    localStorage.removeItem('svSt');
+    role = 'admin';
+    usr = '';
+    fullName = '';
+    loggedIn = false;
+    document.getElementById('loginOverlay').classList.remove('hidden');
+    document.getElementById('lgPass').value = '';
+    document.getElementById('lgUser').value = '';
+    document.getElementById('lgErr').style.display = 'none';
+    document.getElementById('lgBtn').disabled = false;
+    document.getElementById('lgBtn').innerHTML = '<i class="fas fa-sign-in-alt"></i>Sign In';
+    selRole('admin', document.getElementById('roleAdmin'));
+    stpAllCam();
+  }
 
-// Scanner
-async function stCamSc(){document.getElementById('camAr').style.display='block';document.getElementById('manAr').style.display='none';const v=document.getElementById('scVid');try{scStr=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:640},height:{ideal:480}}});v.srcObject=scStr;await v.play();document.getElementById('scCnv').width=v.videoWidth;document.getElementById('scCnv').height=v.videoHeight;document.getElementById('scSt').textContent='Scanning...';scQF()}catch(e){tst('error','Camera error');shMan()}}
-function scQF(){if(!scStr)return;const v=document.getElementById('scVid'),c=document.getElementById('scCnv'),x=c.getContext('2d',{willReadFrequently:true});x.drawImage(v,0,0,c.width,c.height);const id=x.getImageData(0,0,c.width,c.height);if(typeof jsQR!=='undefined'){const cd=jsQR(id.data,id.width,id.height,{inversionAttempts:'dontInvert'});if(cd){document.getElementById('qf').classList.add('act');document.getElementById('scSt').textContent='Found: '+cd.data;spCamSc();prcSB(cd.data);return}}scRf=requestAnimationFrame(scQF)}
-function spCamSc(){if(scRf)cancelAnimationFrame(scRf);scRf=null;if(scStr){scStr.getTracks().forEach(t=>t.stop());scStr=null}}
-function shMan(){spCamSc();document.getElementById('camAr').style.display='none';document.getElementById('manAr').style.display='block'}
-function vfyMan(){const b=document.getElementById('mBid').value.trim();if(!b){tst('error','Enter ID');return}prcSB(b)}
-async function prcSB(bd){document.getElementById('vfyPg').style.display='block';document.getElementById('vPg').textContent='Looking up...';['ck1','ck2','ck3','ck4','ck5'].forEach(id=>{const e=document.getElementById(id);e.querySelector('.sd2').className='sd2';e.querySelector('.sd2').style.background='var(--border)';e.classList.remove('cp','cf')});let bid=bd;if(bd.includes('BID-'))bid=bd.match(/BID-\d+-\d+/)?.[0]||bd;await ldBl();const bl=LD.ballots.find(b=>b.BallotID===bid);const cks=[{id:'ck1',v:'ck1v',t:()=>bl&&bl.BallotID===bid,p:'Authentic',f:'Not found'},{id:'ck2',v:'ck2v',t:()=>bl&&bl.DigitalSignature&&bl.DigitalSignature.length>5,p:'Valid',f:'Invalid'},{id:'ck3',v:'ck3v',t:()=>bl&&bl.SerialNumber&&bl.SerialNumber.startsWith('SN-'),p:bl?.SerialNumber||'—',f:'Invalid'},{id:'ck4',v:'ck4v',t:()=>bl&&bl.StationCode==='NAIROBI-042',p:'Matched',f:'Wrong station'},{id:'ck5',v:'ck5v',t:()=>bl&&bl.Status!=='Cast',p:'No duplicate',f:'ALREADY CAST'}];let ok=true;
-for(const ck of cks){document.getElementById('vPg').textContent='Checking...';await new Promise(r=>setTimeout(r,500));const ps=ck.t();const el=document.getElementById(ck.id),dt=el.querySelector('.sd2'),vl=document.getElementById(ck.v);if(ps){dt.className='sd2 g';vl.textContent=ck.p;vl.style.color='var(--success)';el.classList.add('cp')}else{dt.className='sd2 r';vl.textContent=ck.f;vl.style.color='var(--danger)';el.classList.add('cf');ok=false}}
-document.getElementById('vAn').classList.add('dn');
-if(ok){document.getElementById('vPg').innerHTML='<span style="color:var(--success);font-weight:700">ACCEPTED</span>';document.getElementById('scRs').style.display='block';document.getElementById('scRs').innerHTML='<div style="text-align:center;padding:12px 0"><div style="font-size:30px;color:var(--success)"><i class="fas fa-check-circle"></i></div><div style="font-weight:700;color:var(--success)">Ballot Accepted</div><button class="bt bt-s mt-3" onclick="rsc()">Next</button></div>';aA('info','Ballot '+bid+' accepted');await AP.post('castBallot',{ballotId:bid,user:'SYSTEM'});const lb=LD.ballots.find(b=>b.BallotID===bid);if(lb)lb.Status='Cast';ldSt()}else{document.getElementById('vPg').innerHTML='<span style="color:var(--danger);font-weight:700">REJECTED</span>';document.getElementById('scRs').style.display='block';document.getElementById('scRs').innerHTML='<div style="text-align:center;padding:12px 0"><div style="font-size:30px;color:var(--danger)"><i class="fas fa-times-circle"></i></div><div style="font-weight:700;color:var(--danger)">Rejected</div><button class="bt bt-s mt-3" onclick="rsc()">Retry</button></div>';aA('error','Ballot '+bid+' rejected')}}
-function rsc(){document.getElementById('vfyPg').style.display='none';document.getElementById('scRs').style.display='none';document.getElementById('vAn').classList.remove('dn');['ck1','ck2','ck3','ck4','ck5'].forEach(id=>{const e=document.getElementById(id);e.querySelector('.sd2').className='sd2';e.querySelector('.sd2').style.background='var(--border)';e.querySelector('span:last-child').textContent='Pending';e.querySelector('span:last-child').style.color='var(--muted)';e.classList.remove('cp','cf')});document.getElementById('camAr').style.display='none';document.getElementById('manAr').style.display='none'}
+  // ===== APP INIT =====
+  function showApp() {
+    loggedIn = true;
+    document.getElementById('usrName').textContent = fullName;
+    document.getElementById('usrRole').textContent = role === 'admin' ? 'Electoral Commissioner' : 'Returning Officer';
+    document.querySelectorAll('.admin-only').forEach(function(n) { n.style.display = role === 'admin' ? 'flex' : 'none'; });
+    document.querySelectorAll('.ro-only').forEach(function(n) { n.style.display = role === 'ro' ? 'flex' : 'none'; });
+    document.getElementById('sysMode').textContent = role === 'admin' ? 'ADMIN' : 'RO';
+    
+    // Load data from API
+    loadDataFromAPI();
+    updETypeUI();
+    updPosList();
+    updCandMgmt();
+    updOffList();
+    updResults();
+    updAcct();
+    updDash();
+  }
 
-// Results
-let rsCI=null;function rndRs(rs){const t=rs.reduce((s,c)=>s+(c.Votes||0),0);document.getElementById('rsB').innerHTML=rs.map(c=>{const p=t>0?((c.Votes/t)*100).toFixed(1):0;return'<tr><td style="font-weight:700">'+c.Candidate+'</td><td style="color:var(--muted)">'+c.Party+'</td><td style="font-weight:700">'+c.Votes+'</td><td style="font-weight:700;color:'+c.Color+'">'+p+'%</td><td><div class="vb"><div class="vbi" style="width:'+p+'%;background:'+c.Color+'"></div></div></td></tr>'}).join('');const cx=document.getElementById('rsCh');if(rsCI)rsCI.destroy();if(cx){rsCI=new Chart(cx,{type:'doughnut',data:{labels:rs.map(c=>c.Candidate),datasets:[{data:rs.map(c=>c.Votes),backgroundColor:rs.map(c=>c.Color),borderColor:'#0F2316',borderWidth:2}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{color:'#7A8B7E',font:{size:10}}}}}})}}
+  // ===== LOAD DATA FROM API =====
+  function loadDataFromAPI() {
+    // Load voters
+    apiCall('getVoters')
+      .then(function(result) {
+        if (result.voters) {
+          LD.voters = result.voters;
+          updDash();
+          updRegList();
+          updAcct();
+        }
+      })
+      .catch(function(err) { 
+        console.error('Error loading voters:', err);
+        tst('warning', 'Could not load voters from server');
+      });
 
-// Audit
-function aA(t,m){LD.audit.unshift({Timestamp:new Date().toISOString(),Type:t,Message:m,User:'RO'});rndAu();AP.post('logAudit',{type:t,message:m,user:'RO'})}
-function rndAu(){const h=LD.audit.slice(0,40).map(e=>'<div class="ae"><span class="at">'+(e.Timestamp||'').substring(11,19)+'</span><span class="ay '+(e.Type||'info')+'">'+(e.Type||'info')+'</span><span class="am">'+e.Message+'</span></div>').join('');['dL','adLg'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=h})}
-function aaA(){const m=[{t:'auth',m:'Voter auth complete'},{t:'info',m:'System check OK'}][Math.floor(Math.random()*2)];aA(m.t,m.m)}
+    // Load ballots
+    apiCall('getBallots')
+      .then(function(result) {
+        if (result.ballots) {
+          LD.ballots = result.ballots;
+          updDash();
+          updAcct();
+        }
+      })
+      .catch(function(err) { 
+        console.error('Error loading ballots:', err);
+      });
 
-// Admin
-function rndAdm(){document.getElementById('stTb').innerHTML=LD.stations.map(s=>'<div style="padding:8px;background:var(--bg2);border-radius:6px;margin-bottom:4px;font-size:11px"><strong>'+s.StationCode+'</strong> — '+s.Status+'</div>').join('');rndAu();rndRgR()}
+    // Load results
+    apiCall('getResults')
+      .then(function(result) {
+        if (result.results) {
+          LD.results = result.results;
+          updResults();
+        }
+      })
+      .catch(function(err) { 
+        console.error('Error loading results:', err);
+      });
 
-// Nav
-function sv(id,el){document.querySelectorAll('.vs').forEach(v=>v.style.display='none');const t=document.getElementById('view-'+id);if(t)t.style.display='block';document.querySelectorAll('.ni').forEach(n=>n.classList.remove('act'));if(el)el.classList.add('act');const T={dashboard:'Dashboard',registration:'Register Voter',authentication:'Voter Auth','ballot-gen':'Ballot Gen','ballot-cast':'Ballot Cast',accounting:'Accounting',results:'Results',analytics:'Analytics',admin:'Admin'};document.getElementById('pgT').textContent=T[id]||id;document.querySelector('.sb').classList.remove('op2');if(id==='registration'){rndRgR();uElUI()}}
-function tst(tp,msg){const c=document.getElementById('tst'),t=document.createElement('div');t.className='tt '+tp;const ic={success:'fa-check-circle',error:'fa-times-circle',warning:'fa-exclamation-triangle',info:'fa-info-circle'};t.innerHTML='<i class="fas '+(ic[tp]||'fa-info-circle')+'"></i><span>'+msg+'</span>';c.appendChild(t);setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(30px)';setTimeout(()=>t.remove(),300)},4000)}
-function swTb(id,btn){document.querySelectorAll('.tc2').forEach(t=>t.classList.remove('act'));document.querySelectorAll('.tb').forEach(b=>b.classList.remove('act'));document.getElementById(id).classList.add('act');btn.classList.add('act');rndAdm()}
-function clMdl(){document.getElementById('mdl').classList.remove('sh')}
-function rsh(){tst('info','Refreshing...');ldAll()}
+    // Load audit log
+    apiCall('getAuditLog', { limit: 50 })
+      .then(function(result) {
+        if (result.entries) {
+          LD.audit = result.entries;
+          updDash();
+        }
+      })
+      .catch(function(err) { 
+        console.error('Error loading audit log:', err);
+      });
 
-// Charts
-function iCh(){const h=['8AM','9AM','10AM','11AM','12PM','1PM','2PM','3PM'];const d=[45,78,92,65,42,38,55,48];const c1=document.getElementById('ch1');if(c1)new Chart(c1,{type:'line',data:{labels:h,datasets:[{label:'Verified',data:d,borderColor:'#C9A84C',backgroundColor:'rgba(201,168,76,.1)',fill:true,tension:.4,pointRadius:2}]},options:{responsive:true,plugins:{legend:{labels:{color:'#7A8B7E',font:{size:9}}}},scales:{x:{ticks:{color:'#7A8B7E',font:{size:8}},grid:{color:'rgba(30,58,38,.5)'}},y:{ticks:{color:'#7A8B7E',font:{size:8}},grid:{color:'rgba(30,58,38,.5)'}}}}});const c2=document.getElementById('ch2');if(c2)new Chart(c2,{type:'doughnut',data:{labels:['Cast','Issued','Remaining'],datasets:[{data:[6,2,3],backgroundColor:['#3DA55D','#C9A84C','#1E3A26'],borderColor:'#0F2316',borderWidth:2}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{color:'#7A8B7E',font:{size:9}}}}}})}
+    // Load election config
+    apiCall('getElectionDate')
+      .then(function(result) {
+        if (result.date) {
+          document.getElementById('adEd').textContent = result.date;
+          document.getElementById('elDtH').textContent = 'Election: ' + result.date;
+          if (result.type) {
+            elType = result.type;
+            updETypeUI();
+          }
+        }
+      })
+      .catch(function(err) { 
+        console.error('Error loading election date:', err);
+      });
+  }
+
+  // ===== NAVIGATION =====
+  function sv(v, el) {
+    document.querySelectorAll('.ni').forEach(function(n) { n.classList.remove('act'); });
+    if (el) el.classList.add('act');
+    document.querySelectorAll('.vs').forEach(function(x) { x.classList.remove('vis'); });
+    var t = document.getElementById('view-' + v);
+    if (t) t.classList.add('vis');
+    document.getElementById('pgT').textContent = v.charAt(0).toUpperCase() + v.slice(1);
+    document.querySelector('.sb').classList.remove('op2');
+  }
+
+  function rsh() {
+    loadDataFromAPI();
+    updDash();
+    updPosList();
+    updCandMgmt();
+    updOffList();
+    updResults();
+    updAcct();
+    tst('info', 'Refreshed from server');
+  }
+
+  // ===== DASHBOARD =====
+  function updDash() {
+    document.getElementById('sR').textContent = LD.voters.length;
+    document.getElementById('sV').textContent = LD.voters.filter(function(v) { return v.verified; }).length;
+    document.getElementById('sP').textContent = LD.ballots.filter(function(b) { return b.status === 'printed' || b.status === 'cast'; }).length;
+    document.getElementById('sC').textContent = LD.ballots.filter(function(b) { return b.status === 'cast'; }).length;
+    var dl = document.getElementById('dL');
+    dl.innerHTML = '';
+    var rc = LD.audit.slice(-20).reverse();
+    for (var i = 0; i < rc.length; i++) {
+      var time = rc[i].Timestamp ? new Date(rc[i].Timestamp).toLocaleTimeString() : rc[i].time || '';
+      var type = rc[i].Type || rc[i].type || 'info';
+      var msg = rc[i].Message || rc[i].message || '';
+      dl.innerHTML += '<div class="ae"><span class="at">' + time + '</span><span class="ay ' + type.toLowerCase() + '">' + type + '</span><span class="am">' + msg + '</span></div>';
+    }
+    updCharts();
+  }
+
+  function updCharts() {
+    var ctx1 = document.getElementById('ch1');
+    if (chart1) { chart1.destroy(); chart1 = null; }
+    var d1 = [LD.voters.length, LD.voters.filter(function(v){return v.verified}).length, LD.ballots.filter(function(b){return b.status==='printed'||b.status==='cast'}).length, LD.ballots.filter(function(b){return b.status==='cast'}).length];
+    chart1 = new Chart(ctx1, {
+      type: 'bar',
+      data: { labels: ['Reg','Verified','Printed','Cast'], datasets: [{ data: d1, backgroundColor: ['#2D8B4E','#C9A84C','#3DA55D','#C94444'], borderRadius: 4 }] },
+      options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { color: '#7A8B7E' }, grid: { color: '#1E3A26' } }, x: { ticks: { color: '#7A8B7E' }, grid: { display: false } } } }
+    });
+    var ctx2 = document.getElementById('ch2');
+    if (chart2) { chart2.destroy(); chart2 = null; }
+    var tot = LD.voters.length || 1;
+    chart2 = new Chart(ctx2, {
+      type: 'doughnut',
+      data: { labels: ['Cast','Pending'], datasets: [{ data: [LD.ballots.filter(function(b){return b.status==='cast'}).length, Math.max(0, tot - LD.ballots.filter(function(b){return b.status==='cast'}).length)], backgroundColor: ['#3DA55D','#1E3A26'], borderWidth: 0 }] },
+      options: { responsive: true, plugins: { legend: { labels: { color: '#7A8B7E', font: { size: 10 } } } }, cutout: '65%' }
+    });
+  }
+
+  // ===== CONFIG =====
+  function updETypeUI() {
+    var isNat = elType === 'national';
+    document.getElementById('etNat').className = 'bt ' + (isNat ? 'bt-p' : 'bt-s') + ' flex-1';
+    document.getElementById('etSch').className = 'bt ' + (!isNat ? 'bt-p' : 'bt-s') + ' flex-1';
+    document.getElementById('schLevelSel').style.display = isNat ? 'none' : 'block';
+    document.getElementById('natFields').style.display = isNat ? 'grid' : 'none';
+    document.getElementById('schFields').style.display = isNat ? 'none' : 'grid';
+    document.getElementById('idLabel').textContent = isNat ? 'National ID' : 'Student ID';
+    document.getElementById('elTypeH').textContent = 'Type: ' + elType.toUpperCase();
+    document.getElementById('adEt').textContent = elType.toUpperCase();
+  }
+
+  function setEType(t) {
+    elType = t;
+    LD.elCfg.type = t;
+    updETypeUI();
+    apiCall('setElectionType', { type: t, schoolLevel: schLevel }, 'POST')
+      .then(function(result) {
+        if (result.success) {
+          tst('success', 'Type saved to server: ' + t.toUpperCase());
+        }
+      })
+      .catch(function(err) {
+        console.error('Error saving type:', err);
+        tst('warning', 'Type saved locally only (API unavailable)');
+      });
+  }
+
+  function setSchLevel() {
+    schLevel = document.getElementById('schLevel').value;
+    updETypeUI();
+  }
+
+  function stElDt() {
+    var dt = document.getElementById('elDtIn').value;
+    if (!dt) { tst('warning', 'Select date'); return; }
+    LD.elCfg.date = dt;
+    document.getElementById('adEd').textContent = dt;
+    document.getElementById('elDtH').textContent = 'Election: ' + dt;
+    
+    apiCall('setElectionDate', { date: dt }, 'POST')
+      .then(function(result) {
+        if (result.success) {
+          tst('success', 'Date saved to server: ' + dt);
+        }
+      })
+      .catch(function(err) {
+        console.error('Error saving date:', err);
+        tst('warning', 'Date saved locally only (API unavailable)');
+      });
+  }
+
+  function chPw() {
+    var pw = document.getElementById('nwPw').value;
+    if (!pw || pw.length < 4) { tst('warning', 'Min 4 chars'); return; }
+    
+    apiCall('setAdminPassword', { password: pw }, 'POST')
+      .then(function(result) {
+        if (result.success) {
+          tst('success', 'Password updated on server');
+        }
+      })
+      .catch(function(err) {
+        console.error('Error updating password:', err);
+        tst('warning', 'Password updated locally only (API unavailable)');
+      });
+    
+    var ac = LOCAL_CREDS.find(function(c){return c.username==='admin'});
+    if (ac) ac.password = pw;
+    tst('success', 'Password updated');
+  }
+
+  // ===== POSITIONS =====
+  function updPosList() {
+    var c = document.getElementById('posList');
+    c.innerHTML = '';
+    for (var i = 0; i < LD.positions.length; i++) {
+      var pos = LD.positions[i];
+      var act = LD.candidates[pos] !== undefined;
+      c.innerHTML += '<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--bg2);border-radius:6px;border:1px solid var(--border)"><span style="flex:1;font-size:11px;font-weight:600">' + pos + '</span><button class="bt bt-' + (act ? 'g' : 'd') + '" style="font-size:9px;padding:4px 10px" onclick="window.togPos(\'' + pos + '\')">' + (act ? 'Active' : 'Inactive') + '</button></div>';
+    }
+  }
+
+  function togPos(pos) {
+    if (LD.candidates[pos]) delete LD.candidates[pos];
+    else LD.candidates[pos] = JSON.parse(JSON.stringify(defaultCandidates[pos] || [{ name: 'Candidate A', party: 'Party A', symbol: 'A', letter: 'A' }]));
+    updPosList();
+    updCandMgmt();
+    tst('success', 'Toggled: ' + pos);
+  }
+
+  // ===== CANDIDATES =====
+  function updCandMgmt() {
+    var c = document.getElementById('candMgmt');
+    c.innerHTML = '';
+    var ps = Object.keys(LD.candidates);
+    for (var p = 0; p < ps.length; p++) {
+      var pos = ps[p], list = LD.candidates[pos];
+      var h = '<div class="cd mb-4"><div class="ct">' + pos + '</div><div class="space-y-2 mb-3">';
+      for (var i = 0; i < list.length; i++) {
+        var cd = list[i];
+        h += '<div style="display:flex;align-items:center;gap:8px;padding:6px 8px;background:var(--bg2);border-radius:6px;font-size:11px"><span style="width:24px;height:24px;background:var(--card2);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:12px;border:1px solid var(--border)">' + (cd.symbol || cd.letter) + '</span><span style="flex:1;font-weight:600">' + cd.name + '</span><span style="font-size:9px;color:var(--muted)">' + cd.party + '</span><button class="bt bt-d" style="font-size:8px;padding:3px 8px" onclick="window.rmCand(\'' + pos + '\',' + i + ')"><i class="fas fa-trash"></i></button></div>';
+      }
+      h += '</div><div style="display:flex;gap:6px"><input class="inf" id="nc_' + pos + '" placeholder="Name" style="flex:2"><input class="inf" id="np_' + pos + '" placeholder="Party" style="flex:1"><input class="inf" id="ns_' + pos + '" placeholder="Symbol" style="width:50px"><button class="bt bt-g" style="font-size:9px" onclick="window.addCand(\'' + pos + '\')"><i class="fas fa-plus"></i>Add</button></div></div>';
+      c.innerHTML += h;
+    }
+  }
+
+  function addCand(pos) {
+    var nm = document.getElementById('nc_' + pos).value;
+    if (!nm) { tst('warning', 'Enter name'); return; }
+    var pr = document.getElementById('np_' + pos).value, sy = document.getElementById('ns_' + pos).value, lt = String.fromCharCode(65 + LD.candidates[pos].length);
+    LD.candidates[pos].push({ name: nm, party: pr || 'Independent', symbol: sy || lt, letter: lt });
+    updCandMgmt();
+    tst('success', 'Added: ' + nm);
+  }
+
+  function rmCand(pos, idx) {
+    LD.candidates[pos].splice(idx, 1);
+    updCandMgmt();
+    tst('success', 'Removed');
+  }
+
+  // ===== OFFICERS =====
+  function addOff() {
+    var un = document.getElementById('oUn').value, pw = document.getElementById('oPw').value, nm = document.getElementById('oNm').value, st = document.getElementById('oSt').value;
+    if (!un || !pw || !nm) { tst('warning', 'Fill all fields'); return; }
+    
+    apiCall('addReturningOfficer', { username: un, password: pw, fullName: nm, stationCode: st }, 'POST')
+      .then(function(result) {
+        if (result.success) {
+          tst('success', 'Officer added to server: ' + nm);
+        } else {
+          tst('error', result.message || 'Failed to add officer');
+        }
+      })
+      .catch(function(err) {
+        console.error('Error adding officer:', err);
+        tst('warning', 'Officer added locally only (API unavailable)');
+      });
+    
+    LOCAL_CREDS.push({ username: un, password: pw, role: 'ro', fullName: nm, stationCode: st });
+    LD.officers.push({ username: un, fullName: nm, stationCode: st });
+    updOffList();
+    tst('success', 'Officer added: ' + nm + ' — login: ' + un + '/' + pw);
+  }
+
+  function updOffList() {
+    var c = document.getElementById('offList');
+    c.innerHTML = '';
+    for (var i = 0; i < LD.officers.length; i++) {
+      c.innerHTML += '<div class="sit"><div class="sd2 g"></div><span style="flex:1;font-weight:600">' + LD.officers[i].fullName + '</span><span style="font-size:9px;color:var(--muted)">' + LD.officers[i].username + '</span><span style="font-size:9px;color:var(--accent)">' + LD.officers[i].stationCode + '</span></div>';
+    }
+    if (!LD.officers.length) c.innerHTML = '<div style="font-size:11px;color:var(--muted)">None</div>';
+  }
+
+  // ===== CAMERA =====
+  function stpAllCam() {
+    if (rgStr) { rgStr.getTracks().forEach(function(t){t.stop()}); rgStr = null; }
+    if (fcStr) { fcStr.getTracks().forEach(function(t){t.stop()}); fcStr = null; }
+    if (scStr) { scStr.getTracks().forEach(function(t){t.stop()}); scStr = null; }
+  }
+
+  function openCam(v) {
+    return navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 320 }, height: { ideal: 320 } } })
+      .then(function(s) { v.srcObject = s; return s; })
+      .catch(function(e) { tst('error', 'Camera denied'); return null; });
+  }
+
+  // ===== REGISTRATION =====
+  function stRgCam() {
+    openCam(document.getElementById('rVid')).then(function(s) {
+      if (s) { rgStr = s; document.getElementById('rCamB').style.display = 'none'; document.getElementById('rSnpB').style.display = 'flex'; }
+    });
+  }
+
+  function cpRgPh() {
+    var v = document.getElementById('rVid'), pc = document.getElementById('rPc');
+    pc.width = v.videoWidth || 320;
+    pc.height = v.videoHeight || 320;
+    pc.getContext('2d').drawImage(v, 0, 0);
+    rgPhDt = pc.toDataURL('image/jpeg', 0.8);
+    document.getElementById('rPh').src = rgPhDt;
+    document.getElementById('rPh').style.display = 'block';
+    document.getElementById('rSnpB').style.display = 'none';
+    document.getElementById('rRetB').style.display = 'flex';
+    if (rgStr) { rgStr.getTracks().forEach(function(t){t.stop()}); rgStr = null; }
+    chkReg();
+  }
+
+  function rtRgPh() {
+    rgPhDt = null;
+    document.getElementById('rPh').style.display = 'none';
+    document.getElementById('rRetB').style.display = 'none';
+    document.getElementById('rCamB').style.display = 'flex';
+    chkReg();
+  }
+
+  function chkReg() {
+    document.getElementById('rSubB').disabled = !(document.getElementById('rId').value.length >= 4 && document.getElementById('rNm').value.length >= 2 && rgPhDt);
+  }
+
+  document.addEventListener('input', function(e) {
+    if (e.target.id === 'rId' || e.target.id === 'rNm') chkReg();
+  });
+
+  function subReg() {
+    var id = document.getElementById('rId').value;
+    var nm = document.getElementById('rNm').value;
+    var county = document.getElementById('rCo').value || '';
+    var constituency = document.getElementById('rCn').value || '';
+    var ward = document.getElementById('rWd').value || '';
+    var station = document.getElementById('rSt').value || stCode;
+    
+    if (LD.voters.find(function(v){return v.id===id})) { 
+      tst('error', 'Already registered'); 
+      return; 
+    }
+    
+    var voterData = {
+      nationalId: id,
+      fullName: nm,
+      county: county,
+      constituency: constituency,
+      ward: ward,
+      pollingStation: station,
+      stationCode: station,
+      photoData: rgPhDt,
+      registeredBy: usr || 'RO',
+      role: role
+    };
+    
+    var btn = document.getElementById('rSubB');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+    
+    apiCall('registerVoter', voterData, 'POST')
+      .then(function(result) {
+        if (result.success) {
+          LD.voters.push({ 
+            id: id, 
+            name: nm, 
+            stationCode: station, 
+            photo: rgPhDt, 
+            verified: false, 
+            registeredAt: new Date().toISOString() 
+          });
+          updRegList();
+          updDash();
+          updAcct();
+          document.getElementById('rId').value = '';
+          document.getElementById('rNm').value = '';
+          rtRgPh();
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fas fa-user-plus"></i>Register';
+          tst('success', 'Registered: ' + nm + ' (saved to server)');
+        } else {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fas fa-user-plus"></i>Register';
+          tst('error', result.message || 'Registration failed');
+        }
+      })
+      .catch(function(err) {
+        console.error('Registration error:', err);
+        LD.voters.push({ 
+          id: id, 
+          name: nm, 
+          stationCode: station, 
+          photo: rgPhDt, 
+          verified: false, 
+          registeredAt: new Date().toISOString() 
+        });
+        updRegList();
+        updDash();
+        updAcct();
+        document.getElementById('rId').value = '';
+        document.getElementById('rNm').value = '';
+        rtRgPh();
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-user-plus"></i>Register';
+        tst('warning', 'Registered locally (API unavailable): ' + nm);
+      });
+  }
+
+  function updRegList() {
+    var c = document.getElementById('rRg');
+    c.innerHTML = '';
+    var rc = LD.voters.slice(-10).reverse();
+    for (var i = 0; i < rc.length; i++) {
+      c.innerHTML += '<div class="sit"><div class="sd2 y"></div><span style="flex:1;font-weight:600">' + rc[i].name + '</span><span style="font-size:9px;color:var(--muted)">' + rc[i].id + '</span></div>';
+    }
+  }
+
+  // ===== AUTHENTICATION =====
+  function vfyId() {
+    var id = document.getElementById('nId').value;
+    if (!id) { tst('warning', 'Enter ID'); return; }
+    
+    var v = LD.voters.find(function(x){return x.id===id});
+    if (!v) { 
+      tst('error', 'Not found: ' + id); 
+      return; 
+    }
+    cVtr = v;
+    aSt = 2;
+    document.getElementById('ps1').classList.remove('act');
+    document.getElementById('ps1').classList.add('dn');
+    document.getElementById('pl1').classList.add('dn');
+    document.getElementById('ps2').classList.add('act');
+    document.getElementById('as1').classList.remove('act');
+    document.getElementById('as2').classList.add('act');
+    document.getElementById('sInf').innerHTML = '<strong style="color:var(--accent)">' + v.name + '</strong><br>ID: ' + v.id + '<br>Station: ' + v.stationCode;
+    drawFp();
+    tst('success', 'Found: ' + v.name);
+  }
+
+  function drawFp() {
+    var c = document.getElementById('fpC'), ctx = c.getContext('2d');
+    ctx.fillStyle = '#0B1A0F';
+    ctx.fillRect(0, 0, 170, 190);
+    ctx.strokeStyle = 'rgba(45,139,78,0.3)';
+    for (var i = 0; i < 12; i++) {
+      ctx.beginPath();
+      ctx.ellipse(85, 95, 8 + i * 6, (8 + i * 6) * 1.3, 0, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+  }
+
+  function stFp() {
+    document.getElementById('scLn').style.display = 'block';
+    document.getElementById('fpSt').textContent = 'Scanning...';
+    document.getElementById('fpB').disabled = true;
+    setTimeout(function() {
+      document.getElementById('scLn').style.display = 'none';
+      document.getElementById('fpSt').textContent = 'Match: 94.7%';
+      document.getElementById('fpSt').style.color = 'var(--success)';
+      document.getElementById('fpFb').style.display = 'flex';
+    }, 3000);
+  }
+
+  function fbFp() { advAuth(3); }
+  function skFc() { advAuth(4); }
+
+  function stFc() {
+    openCam(document.getElementById('fcVid')).then(function(s) {
+      fcStr = s;
+      if (!s) return;
+      document.getElementById('phCmp').style.display = 'flex';
+      if (cVtr && cVtr.photo) document.getElementById('rgPh2').src = cVtr.photo;
+      setTimeout(function() {
+        if (fcStr) { fcStr.getTracks().forEach(function(t){t.stop()}); fcStr = null; }
+        advAuth(4);
+      }, 2500);
+    });
+  }
+
+  function advAuth(step) {
+    for (var i = 1; i < step; i++) {
+      document.getElementById('ps' + i).classList.remove('act');
+      document.getElementById('ps' + i).classList.add('dn');
+      document.getElementById('pl' + i).classList.add('dn');
+    }
+    document.getElementById('ps' + step).classList.add('act');
+    document.getElementById('as' + (step - 1)).classList.remove('act');
+    document.getElementById('as' + step).classList.add('act');
+    if (step === 4 && cVtr) {
+      cVtr.verified = true;
+      document.getElementById('sInf').innerHTML = '<strong style="color:var(--accent)">' + cVtr.name + '</strong><br>ID: ' + cVtr.id + '<br><span class="cb on">Verified</span>';
+    }
+  }
+
+  function gtBg() {
+    sv('ballot-gen', document.querySelector('[data-view="ballot-gen"]'));
+    document.getElementById('bgLk').style.display = 'none';
+    document.getElementById('bgRd').style.display = 'block';
+    document.getElementById('gnB').disabled = false;
+    tst('info', 'Ballot generation unlocked');
+  }
+
+  // ===== BALLOT GENERATION =====
+  function drawQR(canvasRef, data) {
+    var c = canvasRef, ctx = c.getContext('2d');
+    ctx.clearRect(0, 0, c.width, c.height);
+    var s = c.width, cl = 3, g = Math.floor(s / cl);
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, s, s);
+    ctx.fillStyle = '#1a1a1a';
+    for (var i = 0; i < g; i++) {
+      for (var j = 0; j < g; j++) {
+        var ci = (i * g + j) % data.length;
+        if (data.charCodeAt(ci) % 3 === 0 || ((i < 3 || i >= g - 3) && (j < 3 || j >= g - 3))) {
+          ctx.fillRect(i * cl, j * cl, cl, cl);
+        }
+      }
+    }
+    var m = 3 * cl;
+    ctx.fillStyle = '#1B5E20';
+    ctx.fillRect(0, 0, m, m);
+    ctx.fillRect(s - m, 0, m, m);
+    ctx.fillRect(0, s - m, m, m);
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(cl, cl, m - 2 * cl, m - 2 * cl);
+    ctx.fillRect(s - m + cl, cl, m - 2 * cl, m - 2 * cl);
+    ctx.fillRect(cl, s - m + cl, m - 2 * cl, m - 2 * cl);
+    ctx.fillStyle = '#1a1a1a';
+    ctx.fillRect(2 * cl, 2 * cl, cl * 2, cl * 2);
+    ctx.fillRect(s - m + 2 * cl, 2 * cl, cl * 2, cl * 2);
+    ctx.fillRect(2 * cl, s - m + 2 * cl, cl * 2, cl * 2);
+    return c.toDataURL('image/png');
+  }
+
+  function genSig(ser, vId, st, pos) {
+    var d = ser + '|' + vId + '|' + st + '|' + pos + '|' + Date.now();
+    var h = 0;
+    for (var i = 0; i < d.length; i++) {
+      h = ((h << 5) - h) + d.charCodeAt(i);
+      h |= 0;
+    }
+    var hx = Math.abs(h).toString(16).toUpperCase().padStart(8, '0');
+    var rn = '';
+    for (var j = 0; j < 24; j++) rn += Math.floor(Math.random() * 16).toString(16).toUpperCase();
+    return hx + '-' + rn;
+  }
+
+  function genBl() {
+    if (!cVtr) { tst('error', 'No voter session'); return; }
+    bGen = true;
+    selCand = {};
+    baseSerial = 'BID-' + (stCode.replace(/[^0-9]/g, '') || '042') + '-' + String(LD.ballots.length + 1).padStart(5, '0');
+    var isNat = elType === 'national', cL = isNat ? 'Republic of Kenya' : 'School Election', oL = isNat ? 'IEBC' : 'SVC', wm = isNat ? 'SECUREVOTE' : 'SCHOOLVOTE';
+    var container = document.getElementById('bPapersContainer');
+    container.innerHTML = '';
+    positionBallots = {};
+    var active = Object.keys(LD.candidates), totalP = active.length;
+    for (var idx = 0; idx < active.length; idx++) {
+      var pos = active[idx], cands = LD.candidates[pos], sfx = posAbbrMap[pos] || pos.substring(0, 3).toUpperCase();
+      var serial = baseSerial + '-' + sfx, sig = genSig(serial, cVtr.id, stCode, pos), qrD = serial + '|' + cVtr.id + '|' + sig.substring(0, 16);
+      positionBallots[pos] = { serial: serial, signature: sig, qrData: qrD };
+      LD.ballots.push({ id: serial, voterId: cVtr.id, stationCode: stCode, position: pos, signature: sig, status: 'generated', generatedAt: new Date().toISOString() });
+      var qCId = 'qrC_' + sfx, qIId = 'qrImg_' + sfx;
+      var paper = document.createElement('div');
+      paper.className = 'bp brl';
+      paper.style.marginBottom = '24px';
+      var cHTML = '';
+      for (var ci = 0; ci < cands.length; ci++) {
+        var cd = cands[ci];
+        cHTML += '<div class="crw" data-pos="' + pos + '" onclick="window.selRow(this,\'' + pos + '\',' + ci + ')"><div class="mb">' + (cd.letter || String.fromCharCode(65 + ci)) + '</div><div class="ci"><div class="cna">' + cd.name + '</div><div class="cpa">' + cd.party + '</div></div><div class="ps2">' + (cd.symbol || cd.letter) + '</div></div>';
+      }
+      paper.innerHTML = '<div class="bwm">' + wm + '</div><div class="bh"><div class="coa"><i class="fas fa-shield-halved"></i></div><div class="ht"><h2>' + cL + '</h2><h1>' + pos.toUpperCase() + '</h1></div><div class="ib">' + oL + '</div></div><div class="bi"><strong>INSTRUCTIONS:</strong> Mark an <strong>"X"</strong> next to your chosen candidate. Vote for ONLY ONE.</div><div class="bbd"><div class="pos-title-bar">' + pos.toUpperCase() + '</div>' + cHTML + '</div><div class="bf"><div class="qa"><canvas id="' + qCId + '" width="72" height="72" style="display:none"></canvas><img id="' + qIId + '" width="72" height="72" style="border:1px solid #ccc" alt="QR"></div><div style="flex:1;padding:0 8px;font-size:8px;color:#555">Station: <strong>' + stCode + '</strong><br>Position: <strong>' + pos.toUpperCase() + '</strong></div><div class="si2"><div style="font-size:8px;font-weight:700">ID: ' + cVtr.id + '</div><div style="font-size:8px;font-weight:700">Serial: ' + serial + '</div><div class="sh">' + sig + '</div></div></div>';
+      container.appendChild(paper);
+      setTimeout(function() {
+        var qrC = document.getElementById(qCId), qrI = document.getElementById(qIId);
+        if (qrC && qrI) qrI.src = drawQR(qrC, qrD);
+      }, 60);
+    }
+    document.getElementById('prB').disabled = false;
+    document.getElementById('spB').style.display = 'flex';
+    document.getElementById('gnB').disabled = true;
+    document.getElementById('bGenInfo').style.display = 'block';
+    document.getElementById('bGenDetails').innerHTML = 'Base: <strong style="color:var(--accent)">' + baseSerial + '</strong><br>Positions: <strong>' + totalP + '</strong> papers<br>Voter: <strong>' + cVtr.name + '</strong><br><span style="color:var(--warn);font-size:10px">Selections stripped before print.</span>';
+    LD.audit.push({ time: new Date().toLocaleTimeString(), type: 'auth', message: 'Generated: ' + baseSerial });
+    tst('success', 'Generated ' + totalP + ' ballot papers');
+    updDash();
+  }
+
+  function selRow(row, pos, idx) {
+    document.querySelectorAll('.crw[data-pos="' + pos + '"]').forEach(function(r) { r.classList.remove('sel'); });
+    row.classList.add('sel');
+    selCand[pos] = idx;
+  }
+
+  function prBl() {
+    if (!bGen) return;
+    document.querySelectorAll('.crw.sel').forEach(function(r) { r.classList.remove('sel'); });
+    selCand = {};
+    var pbK = Object.keys(positionBallots);
+    for (var k = 0; k < pbK.length; k++) {
+      var pb = positionBallots[pbK[k]], b = LD.ballots.find(function(x){return x.id===pb.serial});
+      if (b) b.status = 'printed';
+    }
+    bPrn = true;
+    document.getElementById('prB').disabled = true;
+    LD.audit.push({ time: new Date().toLocaleTimeString(), type: 'auth', message: 'Printed: ' + baseSerial });
+    var isNat = elType === 'national', cL = isNat ? 'Republic of Kenya' : 'School Election', oL = isNat ? 'IEBC' : 'SVC', wm = isNat ? 'SECUREVOTE' : 'SCHOOLVOTE';
+    var activeP = Object.keys(LD.candidates), totalP = activeP.length;
+    var printHTML = '';
+    for (var idx = 0; idx < activeP.length; idx++) {
+      var pos = activeP[idx], cands = LD.candidates[pos], sfx = posAbbrMap[pos] || pos.substring(0, 3).toUpperCase(), pb = positionBallots[pos];
+      var qrSrc = '';
+      var qrC = document.getElementById('qrC_' + sfx);
+      if (qrC) qrSrc = drawQR(qrC, pb.qrData);
+      if (!qrSrc) {
+        var tmp = document.createElement('canvas');
+        tmp.width = 72;
+        tmp.height = 72;
+        qrSrc = drawQR(tmp, pb.qrData);
+      }
+      var cHTML = '';
+      for (var ci = 0; ci < cands.length; ci++) {
+        var cd = cands[ci];
+        cHTML += '<div class="crw"><div class="mb">' + (cd.letter || String.fromCharCode(65 + ci)) + '</div><div class="ci"><div class="cna">' + cd.name + '</div><div class="cpa">' + cd.party + '</div></div><div class="ps2">' + (cd.symbol || cd.letter) + '</div></div>';
+      }
+      var isLast = idx === totalP - 1;
+      printHTML += '<div style="' + (isLast ? 'page-break-after:avoid' : 'page-break-after:always') + '"><div class="bp"><div class="bwm">' + wm + '</div><div class="bh"><div class="coa"><i class="fas fa-shield-halved"></i></div><div class="ht"><h2>' + cL + '</h2><h1>' + pos.toUpperCase() + '</h1></div><div class="ib">' + oL + '</div></div><div class="bi"><strong>INSTRUCTIONS:</strong> Mark an <strong>"X"</strong> next to your chosen candidate. Vote for ONLY ONE.</div><div class="bbd"><div class="pos-title-bar">' + pos.toUpperCase() + '</div>' + cHTML + '</div><div class="bf"><div class="qa"><img src="' + qrSrc + '" width="72" height="72" style="border:1px solid #ccc" alt="QR"></div><div style="flex:1;padding:0 8px;font-size:8px;color:#555">Station: <strong>' + stCode + '</strong><br>Position: <strong>' + pos.toUpperCase() + '</strong></div><div class="si2"><div style="font-size:8px;font-weight:700;color:#333">ID: ' + cVtr.id + '</div><div style="font-size:8px;font-weight:700;color:#333">Serial: ' + pb.serial + '</div><div class="sh">' + pb.signature + '</div></div></div></div></div>';
+    }
+    var pw = window.open('', '_blank', 'width=700,height=900');
+    pw.document.write('<!DOCTYPE html><html><head><title>SecureVote - ' + baseSerial + '</title><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Sans+3:wght@300;400;600;700;900&display=swap" rel="stylesheet"><style>*,*::before,*::after{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important}@page{size:A4;margin:8mm}body{margin:0;padding:0;background:#fff;font-family:"Source Sans 3",sans-serif}.bp{background:#FFFEF5;color:#1a1a1a;border:3px solid #1a1a1a;border-radius:3px;max-width:540px;margin:0 auto;position:relative}.bwm{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-30deg);font-size:50px;font-weight:900;color:rgba(0,0,0,.03);pointer-events:none;white-space:nowrap;letter-spacing:8px;z-index:1;font-family:"Playfair Display",serif}.bh{background:linear-gradient(135deg,#1B5E20,#2E7D32)!important;color:#fff!important;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid #1a1a1a}.bh .coa{width:38px;height:38px;background:rgba(255,255,255,.15)!important;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid #C9A84C;color:#C9A84C;font-size:16px}.bh .ht{text-align:center;flex:1;padding:0 8px}.bh .ht h2{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase}.bh .ht h1{font-size:13px;font-weight:900;margin-top:1px;font-family:"Playfair Display",serif}.bh .ib{padding:2px 6px;background:#C9A84C!important;color:#1a1a1a!important;font-size:7px;font-weight:900;letter-spacing:2px;border-radius:2px;text-transform:uppercase}.bi{background:#F5F0E0!important;padding:6px 10px;border-bottom:1px solid #ccc;font-size:9px;color:#555;line-height:1.4}.bi strong{color:#1a1a1a}.bbd{padding:8px 10px}.pos-title-bar{background:#1B5E20!important;color:#fff!important;text-align:center;padding:5px;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;border-radius:2px}.crw{display:flex;align-items:center;gap:8px;padding:7px 8px;border:2px solid #ddd;border-radius:3px;margin-bottom:5px;background:#fff!important}.crw .mb{width:26px;height:26px;border:2px solid #333;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px;color:#1B5E20;flex-shrink:0}.crw .ci{flex:1}.crw .ci .cna{font-size:11px;font-weight:700;color:#1a1a1a}.crw .ci .cpa{font-size:9px;color:#666;margin-top:1px}.crw .ps2{width:28px;height:28px;border-radius:3px;background:#f0f0f0!important;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;border:1px solid #ddd}.bf{border-top:2px solid #1a1a1a;padding:6px 10px;display:flex;align-items:flex-start;justify-content:space-between;background:#FAFAF0!important}.bf .qa{text-align:center}.bf .si2{font-size:8px;color:#888;text-align:right;line-height:1.4;max-width:220px}.bf .si2 .sh{font-family:monospace;font-size:6px;word-break:break-all;color:#555}</style></head><body>' + printHTML + '<div style="text-align:center;font-size:8px;color:#aaa;margin-top:8px">SecureVote - ' + new Date().toLocaleString() + ' - ' + baseSerial + '</div><script>window.onload=function(){setTimeout(function(){window.print();},800);};<\/script></body></html>');
+    pw.document.close();
+    tst('success', 'Printing ' + totalP + ' positions');
+    updDash();
+    updAcct();
+  }
+
+  function spBl() {
+    if (!bGen) return;
+    var pbK = Object.keys(positionBallots);
+    for (var k = 0; k < pbK.length; k++) {
+      var pb = positionBallots[pbK[k]], b = LD.ballots.find(function(x){return x.id===pb.serial});
+      if (b) b.status = 'spoiled';
+    }
+    LD.audit.push({ time: new Date().toLocaleTimeString(), type: 'error', message: 'Spoiled: ' + baseSerial });
+    bGen = false;
+    bPrn = false;
+    document.getElementById('prB').disabled = true;
+    document.getElementById('spB').style.display = 'none';
+    document.getElementById('gnB').disabled = false;
+    document.getElementById('bPapersContainer').innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted)">Spoiled. Click Generate to retry.</div>';
+    document.getElementById('bGenInfo').style.display = 'none';
+    tst('warning', 'Spoiled');
+    updDash();
+    updAcct();
+  }
+
+  // ===== BALLOT CAST =====
+  function stCamSc() {
+    document.getElementById('camAr').style.display = 'block';
+    document.getElementById('manAr').style.display = 'none';
+    openCam(document.getElementById('scVid')).then(function(s) {
+      scStr = s;
+      scanInt = setInterval(function() {
+        var vid = document.getElementById('scVid');
+        if (vid.readyState >= 2) {
+          var cnv = document.getElementById('scCnv');
+          cnv.width = 320;
+          cnv.height = 240;
+          cnv.getContext('2d').drawImage(vid, 0, 0, 320, 240);
+          var img = cnv.getContext('2d').getImageData(0, 0, 320, 240);
+          if (typeof jsQR === 'function') {
+            var code = jsQR(img.data, 320, 240);
+            if (code) {
+              processQR(code.data);
+              spCamSc();
+            }
+          }
+        }
+      }, 200);
+    });
+  }
+
+  function shMan() {
+    document.getElementById('camAr').style.display = 'none';
+    document.getElementById('manAr').style.display = 'block';
+    if (scStr) { scStr.getTracks().forEach(function(t){t.stop()}); scStr = null; }
+  }
+
+  function spCamSc() {
+    if (scanInt) { clearInterval(scanInt); scanInt = null; }
+    if (scStr) { scStr.getTracks().forEach(function(t){t.stop()}); scStr = null; }
+    document.getElementById('camAr').style.display = 'none';
+  }
+
+  function vfyMan() {
+    var bid = document.getElementById('mBid').value.trim();
+    if (!bid) { tst('warning', 'Enter ballot ID'); return; }
+    processQR(bid);
+  }
+
+  function processQR(data) {
+    var parts = data.split('|'), bid = parts[0] || data;
+    var ballot = LD.ballots.find(function(b){return b.id===bid});
+    if (!ballot) { tst('error', 'Not found'); return; }
+    if (ballot.status === 'cast') { tst('error', 'Already cast'); return; }
+    if (ballot.status === 'spoiled') { tst('error', 'Spoiled'); return; }
+    document.getElementById('vfyPg').style.display = 'block';
+    var checks = [
+      { id: 'ck1', v: 'ck1v', ok: true },
+      { id: 'ck2', v: 'ck2v', ok: parts.length >= 3 },
+      { id: 'ck3', v: 'ck3v', ok: bid.startsWith('BID-') },
+      { id: 'ck4', v: 'ck4v', ok: ballot.stationCode === stCode },
+      { id: 'ck5', v: 'ck5v', ok: !LD.ballots.some(function(b){return b.id===bid && b.status==='cast'}) }
+    ];
+    for (var i = 0; i < checks.length; i++) {
+      var ck = checks[i];
+      setTimeout(function(c) {
+        document.getElementById(c.id).querySelector('.sd2').className = 'sd2 ' + (c.ok ? 'g' : 'r');
+        document.getElementById(c.v).textContent = c.ok ? 'PASS' : 'FAIL';
+        document.getElementById(c.v).style.color = c.ok ? 'var(--success)' : 'var(--danger)';
+      }, (i + 1) * 600, ck);
+    }
+    var allOk = checks.every(function(c){return c.ok});
+    setTimeout(function() {
+      if (allOk) {
+        document.getElementById('vAn').classList.add('dn');
+        document.getElementById('vPg').textContent = 'All checks passed';
+        document.getElementById('cstB').disabled = false;
+      } else {
+        document.getElementById('vPg').textContent = 'Failed';
+      }
+      document.getElementById('vPg').style.color = allOk ? 'var(--success)' : 'var(--danger)';
+    }, checks.length * 600 + 500);
+    cBIDs.push(bid);
+  }
+
+  function cstBl() {
+    if (!cBIDs.length) return;
+    var bid = cBIDs.pop(), ballot = LD.ballots.find(function(b){return b.id===bid});
+    if (!ballot) return;
+    ballot.status = 'cast';
+    LD.audit.push({ time: new Date().toLocaleTimeString(), type: 'auth', message: 'Cast: ' + bid });
+    document.getElementById('cstB').disabled = true;
+    rstCastChecks();
+    tst('success', 'Cast: ' + bid);
+    updDash();
+    updResults();
+    updAcct();
+  }
+
+  function rstCastChecks() {
+    for (var i = 1; i <= 5; i++) {
+      document.getElementById('ck' + i).querySelector('.sd2').className = 'sd2';
+      document.getElementById('ck' + i).querySelector('.sd2').style.background = 'var(--border)';
+      document.getElementById('ck' + i + 'v').textContent = 'Pending';
+    }
+    document.getElementById('vfyPg').style.display = 'none';
+    document.getElementById('vAn').classList.remove('dn');
+  }
+
+  // ===== RESULTS =====
+  function updResults() {
+    var c = document.getElementById('resultsByPosition');
+    c.innerHTML = '';
+    var ps = Object.keys(LD.candidates);
+    for (var p = 0; p < ps.length; p++) {
+      var pos = ps[p], cands = LD.candidates[pos], totalV = LD.results.filter(function(r){return r.position===pos}).reduce(function(s,r){return s+r.votes}, 0);
+      var h = '<div class="cd mb-4"><div class="ct">' + pos + ' - ' + totalV + ' votes</div><table class="rt2"><thead><tr><th>Candidate</th><th>Party</th><th>Votes</th></tr></thead><tbody>';
+      for (var i = 0; i < cands.length; i++) {
+        var cd = cands[i], res = LD.results.find(function(r){return r.position===pos && r.candidate===cd.name}), v = res ? res.votes : 0;
+        h += '<tr><td style="font-weight:700">' + cd.name + '</td><td>' + cd.party + '</td><td>' + v + '</td></tr>';
+      }
+      h += '</tbody></table></div>';
+      c.innerHTML += h;
+    }
+  }
+
+  // ===== ACCOUNTING =====
+  function updAcct() {
+    var reg = LD.voters.length, iss = LD.ballots.filter(function(b){return b.status==='printed'||b.status==='cast'}).length, cst = LD.ballots.filter(function(b){return b.status==='cast'}).length, spl = LD.ballots.filter(function(b){return b.status==='spoiled'}).length;
+    document.getElementById('aR2').textContent = reg;
+    document.getElementById('aI2').textContent = iss;
+    document.getElementById('aC2').textContent = cst;
+    document.getElementById('aSp2').textContent = spl;
+    document.getElementById('rcTb').innerHTML = '<table class="rt2"><thead><tr><th>Item</th><th>Count</th><th>Status</th></tr></thead><tbody><tr><td>Registered</td><td>' + reg + '</td><td><span class="cb on">OK</span></td></tr><tr><td>Issued</td><td>' + iss + '</td><td><span class="cb ck">Verified</span></td></tr><tr><td>Cast</td><td>' + cst + '</td><td><span class="cb on">Counted</span></td></tr><tr><td>Spoiled</td><td>' + spl + '</td><td><span class="cb of">Spoiled</span></td></tr></tbody></table>';
+  }
+
+  // ===== UTILITY =====
+  function swTb(id, el) {
+    document.querySelectorAll('.tb').forEach(function(b) { b.classList.remove('act'); });
+    el.classList.add('act');
+    document.querySelectorAll('.tc2').forEach(function(t) { t.classList.remove('act'); });
+    document.getElementById(id).classList.add('act');
+  }
+
+  function shMdl(h) {
+    document.getElementById('mdlB').innerHTML = h;
+    document.getElementById('mdl').classList.add('sh');
+  }
+
+  function clMdl() {
+    document.getElementById('mdl').classList.remove('sh');
+  }
+
+  // ===== EXPOSE TO GLOBAL =====
+  window.tst = tst;
+  window.selRole = selRole;
+  window.doLogin = doLogin;
+  window.doLogout = doLogout;
+  window.sv = sv;
+  window.rsh = rsh;
+  window.updETypeUI = updETypeUI;
+  window.setEType = setEType;
+  window.setSchLevel = setSchLevel;
+  window.stElDt = stElDt;
+  window.chPw = chPw;
+  window.updPosList = updPosList;
+  window.togPos = togPos;
+  window.updCandMgmt = updCandMgmt;
+  window.addCand = addCand;
+  window.rmCand = rmCand;
+  window.addOff = addOff;
+  window.updOffList = updOffList;
+  window.stRgCam = stRgCam;
+  window.cpRgPh = cpRgPh;
+  window.rtRgPh = rtRgPh;
+  window.subReg = subReg;
+  window.vfyId = vfyId;
+  window.stFp = stFp;
+  window.fbFp = fbFp;
+  window.skFc = skFc;
+  window.stFc = stFc;
+  window.gtBg = gtBg;
+  window.genBl = genBl;
+  window.selRow = selRow;
+  window.prBl = prBl;
+  window.spBl = spBl;
+  window.stCamSc = stCamSc;
+  window.shMan = shMan;
+  window.spCamSc = spCamSc;
+  window.vfyMan = vfyMan;
+  window.cstBl = cstBl;
+  window.updResults = updResults;
+  window.updAcct = updAcct;
+  window.swTb = swTb;
+  window.shMdl = shMdl;
+  window.clMdl = clMdl;
+  window.stpAllCam = stpAllCam;
+  window.updDash = updDash;
+  window.updRegList = updRegList;
+  window.chkReg = chkReg;
+  window.loadDataFromAPI = loadDataFromAPI;
+
+  // ===== INIT =====
+  (function() {
+    var sr = localStorage.getItem('svRole');
+    if (sr) {
+      role = sr;
+      usr = localStorage.getItem('svUser') || '';
+      fullName = localStorage.getItem('svName') || '';
+      stCode = localStorage.getItem('svSt') || 'NAIROBI-042';
+      loggedIn = true;
+    }
+    if (loggedIn) {
+      document.getElementById('loginOverlay').classList.add('hidden');
+      showApp();
+    }
+  })();
+
+  console.log('All functions exposed to window.');
+  console.log('API_URL:', API_URL);
+})();
 </script>
 </body>
 </html>
