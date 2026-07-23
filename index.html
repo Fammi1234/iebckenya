@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SecureVote — Electoral Ballot System</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -110,7 +110,7 @@
 
 <div class="mc">
   <header class="mh">
-    <div style="display:flex;align-items:center;gap:12px"><div class="lb"><div class="ld"></div>LIVE</div><div class="pt" id="pgT">Dashboard</div><div class="cb ck" id="cnB"><i class="fas fa-circle" style="font-size:5px"></i><span id="cnT">Offline</span></div></div>
+    <div style="display:flex;align-items:center;gap:12px"><div class="lb"><div class="ld"></div>LIVE</div><div class="pt" id="pgT">Dashboard</div><div class="cb ck" id="cnB"><i class="fas fa-circle" style="font-size:5px"></i><span id="cnT">Checking...</span></div></div>
     <div class="ha"><div style="font-size:10px;color:var(--muted);text-align:right"><div id="elDtH">Election: &mdash;</div><div id="elTypeH">Type: &mdash;</div></div><button class="hb" onclick="window.rsh()"><i class="fas fa-sync-alt"></i></button><button class="hb" onclick="window.doLogout()"><i class="fas fa-sign-out-alt"></i></button></div>
   </header>
 
@@ -208,7 +208,6 @@
   console.log('SecureVote script loaded');
 
   // ===== CONFIGURATION =====
-  // UPDATED: Your deployed Apps Script URL
   const API_URL = 'https://script.google.com/macros/s/AKfycbw-_hU5mn5p1qjR73Oe-GLE_zHXFOBlI5GtxjW_wkroRlqNzLEJ--jzmak2oICFSHtj/exec';
   
   // ===== LOCAL STORAGE CREDENTIALS (Fallback if API fails) =====
@@ -227,6 +226,7 @@
   var chart1 = null, chart2 = null;
   var baseSerial = '', positionBallots = {}, scanInt = null;
   var posAbbrMap = { President: 'PRES', Governor: 'GOV', Senator: 'SEN', MP: 'MP', MCA: 'MCA' };
+  var apiOnline = false;
 
   var defaultCandidates = {
     President: [ { name: 'ODINGA Raila', party: 'ODM', symbol: 'A', letter: 'A' }, { name: 'RUTO William', party: 'UDA', symbol: 'B', letter: 'B' }, { name: 'WETANGULA Moses', party: 'FORD-K', symbol: 'C', letter: 'C' }, { name: 'KALONZO Musyoka', party: 'Wiper', symbol: 'D', letter: 'D' } ],
@@ -236,6 +236,24 @@
     MCA: [ { name: 'KAURA James', party: 'ODM', symbol: 'A', letter: 'A' }, { name: 'WAMBUA Peter', party: 'Wiper', symbol: 'B', letter: 'B' } ]
   };
   LD.candidates = JSON.parse(JSON.stringify(defaultCandidates));
+
+  // ===== SET ONLINE STATUS =====
+  function setOnlineStatus(online) {
+    apiOnline = online;
+    var el = document.getElementById('cnT');
+    var icon = document.querySelector('#cnB i');
+    var container = document.getElementById('cnB');
+    
+    if (online) {
+      el.textContent = 'Online';
+      container.className = 'cb on';
+      if (icon) icon.style.color = 'var(--success)';
+    } else {
+      el.textContent = 'Offline';
+      container.className = 'cb ck';
+      if (icon) icon.style.color = 'var(--accent)';
+    }
+  }
 
   // ===== API HELPER =====
   function apiCall(action, data, method) {
@@ -253,8 +271,16 @@
             if (!response.ok) throw new Error('HTTP ' + response.status);
             return response.json(); 
           })
-          .then(function(result) { resolve(result); })
-          .catch(function(err) { reject(err); });
+          .then(function(result) { 
+            if (result.status === 'online' || result.available_actions) {
+              setOnlineStatus(true);
+            }
+            resolve(result); 
+          })
+          .catch(function(err) { 
+            setOnlineStatus(false);
+            reject(err); 
+          });
       } else {
         fetch(url, {
           method: 'POST',
@@ -265,8 +291,14 @@
             if (!response.ok) throw new Error('HTTP ' + response.status);
             return response.json(); 
           })
-          .then(function(result) { resolve(result); })
-          .catch(function(err) { reject(err); });
+          .then(function(result) { 
+            setOnlineStatus(true);
+            resolve(result); 
+          })
+          .catch(function(err) { 
+            setOnlineStatus(false);
+            reject(err); 
+          });
       }
     });
   }
@@ -324,7 +356,6 @@
       btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking...';
       eb.style.display = 'none';
 
-      // Try API login first
       apiCall('login', { username: un, password: pw })
         .then(function(result) {
           if (result.success) {
@@ -375,7 +406,6 @@
         })
         .catch(function(err) {
           console.error('Login API error:', err);
-          // Fallback to local credentials
           var match = null;
           for (var i = 0; i < LOCAL_CREDS.length; i++) {
             var c = LOCAL_CREDS[i];
@@ -431,6 +461,7 @@
     document.getElementById('lgBtn').innerHTML = '<i class="fas fa-sign-in-alt"></i>Sign In';
     selRole('admin', document.getElementById('roleAdmin'));
     stpAllCam();
+    setOnlineStatus(false);
   }
 
   // ===== APP INIT =====
@@ -442,7 +473,6 @@
     document.querySelectorAll('.ro-only').forEach(function(n) { n.style.display = role === 'ro' ? 'flex' : 'none'; });
     document.getElementById('sysMode').textContent = role === 'admin' ? 'ADMIN' : 'RO';
     
-    // Load data from API
     loadDataFromAPI();
     updETypeUI();
     updPosList();
@@ -455,7 +485,23 @@
 
   // ===== LOAD DATA FROM API =====
   function loadDataFromAPI() {
-    // Load voters
+    // Test ping first
+    apiCall('ping')
+      .then(function(result) {
+        console.log('Ping response:', result);
+        if (result.status === 'online') {
+          setOnlineStatus(true);
+          tst('success', 'Connected to SecureVote API');
+        } else {
+          setOnlineStatus(false);
+        }
+      })
+      .catch(function(err) {
+        console.error('Ping error:', err);
+        setOnlineStatus(false);
+        tst('warning', 'API unavailable - using local data');
+      });
+
     apiCall('getVoters')
       .then(function(result) {
         if (result.voters) {
@@ -467,10 +513,8 @@
       })
       .catch(function(err) { 
         console.error('Error loading voters:', err);
-        tst('warning', 'Could not load voters from server');
       });
 
-    // Load ballots
     apiCall('getBallots')
       .then(function(result) {
         if (result.ballots) {
@@ -483,7 +527,6 @@
         console.error('Error loading ballots:', err);
       });
 
-    // Load results
     apiCall('getResults')
       .then(function(result) {
         if (result.results) {
@@ -495,7 +538,6 @@
         console.error('Error loading results:', err);
       });
 
-    // Load audit log
     apiCall('getAuditLog', { limit: 50 })
       .then(function(result) {
         if (result.entries) {
@@ -507,7 +549,6 @@
         console.error('Error loading audit log:', err);
       });
 
-    // Load election config
     apiCall('getElectionDate')
       .then(function(result) {
         if (result.date) {
@@ -765,7 +806,8 @@
     pc.width = v.videoWidth || 320;
     pc.height = v.videoHeight || 320;
     pc.getContext('2d').drawImage(v, 0, 0);
-    rgPhDt = pc.toDataURL('image/jpeg', 0.8);
+    // Reduce quality to 0.6 to avoid data too large
+    rgPhDt = pc.toDataURL('image/jpeg', 0.6);
     document.getElementById('rPh').src = rgPhDt;
     document.getElementById('rPh').style.display = 'block';
     document.getElementById('rSnpB').style.display = 'none';
@@ -790,6 +832,7 @@
     if (e.target.id === 'rId' || e.target.id === 'rNm') chkReg();
   });
 
+  // ===== REGISTER VOTER - UPDATED WITH DEBUG =====
   function subReg() {
     var id = document.getElementById('rId').value;
     var nm = document.getElementById('rNm').value;
@@ -799,62 +842,55 @@
     var station = document.getElementById('rSt').value || stCode;
     
     if (LD.voters.find(function(v){return v.id===id})) { 
-      tst('error', 'Already registered'); 
-      return; 
+        tst('error', 'Already registered'); 
+        return; 
+    }
+    
+    if (!id || id.length < 4) {
+        tst('error', 'Please enter a valid ID (minimum 4 characters)');
+        return;
+    }
+    
+    if (!nm || nm.length < 2) {
+        tst('error', 'Please enter a valid name');
+        return;
+    }
+    
+    if (!rgPhDt) {
+        tst('error', 'Please take a photo first');
+        return;
     }
     
     var voterData = {
-      nationalId: id,
-      fullName: nm,
-      county: county,
-      constituency: constituency,
-      ward: ward,
-      pollingStation: station,
-      stationCode: station,
-      photoData: rgPhDt,
-      registeredBy: usr || 'RO',
-      role: role
+        nationalId: id,
+        fullName: nm,
+        county: county,
+        constituency: constituency,
+        ward: ward,
+        pollingStation: station,
+        stationCode: station,
+        photoData: rgPhDt,
+        registeredBy: usr || 'RO',
+        role: role
     };
     
     var btn = document.getElementById('rSubB');
     btn.disabled = true;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
     
-    apiCall('registerVoter', voterData, 'POST')
-      .then(function(result) {
-        if (result.success) {
-          LD.voters.push({ 
+    console.log('Sending registration data:', voterData);
+    console.log('Photo data length:', rgPhDt ? rgPhDt.length : 0);
+    
+    // First check if API is online
+    if (!apiOnline) {
+        // If offline, save locally
+        LD.voters.push({ 
             id: id, 
             name: nm, 
             stationCode: station, 
             photo: rgPhDt, 
             verified: false, 
             registeredAt: new Date().toISOString() 
-          });
-          updRegList();
-          updDash();
-          updAcct();
-          document.getElementById('rId').value = '';
-          document.getElementById('rNm').value = '';
-          rtRgPh();
-          btn.disabled = false;
-          btn.innerHTML = '<i class="fas fa-user-plus"></i>Register';
-          tst('success', 'Registered: ' + nm + ' (saved to server)');
-        } else {
-          btn.disabled = false;
-          btn.innerHTML = '<i class="fas fa-user-plus"></i>Register';
-          tst('error', result.message || 'Registration failed');
-        }
-      })
-      .catch(function(err) {
-        console.error('Registration error:', err);
-        LD.voters.push({ 
-          id: id, 
-          name: nm, 
-          stationCode: station, 
-          photo: rgPhDt, 
-          verified: false, 
-          registeredAt: new Date().toISOString() 
         });
         updRegList();
         updDash();
@@ -864,8 +900,77 @@
         rtRgPh();
         btn.disabled = false;
         btn.innerHTML = '<i class="fas fa-user-plus"></i>Register';
-        tst('warning', 'Registered locally (API unavailable): ' + nm);
-      });
+        tst('warning', 'API is offline - Registered locally only: ' + nm);
+        return;
+    }
+    
+    apiCall('registerVoter', voterData, 'POST')
+        .then(function(result) {
+            console.log('Registration response:', result);
+            if (result.success) {
+                LD.voters.push({ 
+                    id: id, 
+                    name: nm, 
+                    stationCode: station, 
+                    photo: rgPhDt, 
+                    verified: false, 
+                    registeredAt: new Date().toISOString() 
+                });
+                updRegList();
+                updDash();
+                updAcct();
+                document.getElementById('rId').value = '';
+                document.getElementById('rNm').value = '';
+                rtRgPh();
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-user-plus"></i>Register';
+                tst('success', 'Registered: ' + nm + ' (saved to server)');
+            } else {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-user-plus"></i>Register';
+                tst('error', 'Server error: ' + (result.message || 'Registration failed'));
+                // Still save locally as fallback
+                LD.voters.push({ 
+                    id: id, 
+                    name: nm, 
+                    stationCode: station, 
+                    photo: rgPhDt, 
+                    verified: false, 
+                    registeredAt: new Date().toISOString() 
+                });
+                updRegList();
+                updDash();
+                updAcct();
+                document.getElementById('rId').value = '';
+                document.getElementById('rNm').value = '';
+                rtRgPh();
+                tst('warning', 'Saved locally (server error): ' + nm);
+            }
+        })
+        .catch(function(err) {
+            console.error('Registration error details:', err);
+            var errorMsg = err.message || 'Unknown error';
+            tst('error', 'Registration failed: ' + errorMsg);
+            
+            // Still save locally as fallback
+            LD.voters.push({ 
+                id: id, 
+                name: nm, 
+                stationCode: station, 
+                photo: rgPhDt, 
+                verified: false, 
+                registeredAt: new Date().toISOString() 
+            });
+            updRegList();
+            updDash();
+            updAcct();
+            document.getElementById('rId').value = '';
+            document.getElementById('rNm').value = '';
+            rtRgPh();
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-user-plus"></i>Register';
+            tst('warning', 'Registered locally (API error): ' + nm);
+        });
   }
 
   function updRegList() {
@@ -1313,9 +1418,14 @@
   window.updRegList = updRegList;
   window.chkReg = chkReg;
   window.loadDataFromAPI = loadDataFromAPI;
+  window.setOnlineStatus = setOnlineStatus;
+  window.apiOnline = apiOnline;
 
   // ===== INIT =====
   (function() {
+    // Initially show "Checking..."
+    setOnlineStatus(false);
+    
     var sr = localStorage.getItem('svRole');
     if (sr) {
       role = sr;
